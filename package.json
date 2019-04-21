@@ -10,11 +10,13 @@
   "dependencies": {
     "core-js": "^2.6.5",
     "d3": "^5.9.2",
+    "sodium-browserify-tweetnacl": "^0.2.6",
     "ssb-client": "^4.7.2",
     "ssb-markdown": "^4.1.1",
     "topojson-client": "^3.0.0",
     "vue": "^2.6.10",
     "vue-router": "^3.0.6",
+    "vue-ssb": "^1.0.0",
     "vue-timeago": "^5.1.2"
   },
   "devDependencies": {
