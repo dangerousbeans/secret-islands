@@ -1,5 +1,5 @@
 <template>
-  <div class="hello">
+  <div class="row">
     <h1>{{ identity }}</h1>
     
     <Message v-for="message in messages" :message="message"></Message>

@@ -12,7 +12,7 @@
         </span>
       </h5>
 
-      <p v-html="message.value.content.text"></p>
+      <p v-html="textmd"></p>
 
       <div class="float-right text-muted small">
         <!-- <timeago v-if="message.value.timestamp" :since="message.value.timestamp" :auto-update="60"></timeago> -->
@@ -31,6 +31,7 @@
 import sbotLibs from './../sbot'
 import pull from 'pull-stream'
 pull.paraMap = require('pull-paramap')
+var md = require('ssb-markdown')
 
 export default {
   name: 'message',
@@ -39,7 +40,8 @@ export default {
   data() {
     return {
       avatar: "http://via.placeholder.com/90x90",
-      author: "..."
+      author: "...",
+      textmd: "..."
     }
   },
   methods: {
@@ -55,6 +57,8 @@ export default {
 
   mounted: function()
   {
+    this.$data.textmd = md.block(this.message.value.content.text, { toUrl: function( blob ){ return "http://localhost:9000/blobs/get/" + blob } })
+
     // Async fetch and connect ssb
     this.$ssb.then((ssb) => {
       sbotLibs.displayName(ssb, this.message.value.author, this.name_loaded)
@@ -72,3 +76,13 @@ export default {
   
 }
 </script>
+
+<style scoped>
+
+.media-body
+{
+}
+
+img {
+}
+</style>  

@@ -21,7 +21,7 @@ var config = Config('ssb', {
 	}
 })
 
-var keys = ssbKeys.loadOrCreateSync("ssb_server_private")
+var keys = ssbKeys.loadOrCreateSync("secret")
 config.keys = keys
 
 // add plugins
