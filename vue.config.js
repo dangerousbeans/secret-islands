@@ -11,4 +11,10 @@ module.exports = {
       .use('vue-svg-loader')
       .loader('vue-svg-loader');
   },
+
+  // Github pages setup
+  publicPath: process.env.NODE_ENV === 'production'
+	    ? '/secret-islands/'
+	    : '/'
+	
 }
