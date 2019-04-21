@@ -8,7 +8,7 @@
     <div id="thread_container" class="card" style="width: 33%;">
       <div class="card-body">
         <h2 class="card-title">{{$route.params.x}} / {{$route.params.y}}</h2>
-        <Messages></Messages>
+        <Messages :key="map_key" :x="$route.params.x" :y="$route.params.y"></Messages>
       </div>  
     </div>
 
@@ -537,7 +537,11 @@ html, body {
   position: absolute;
   margin-left: 54%;
   top: 18%;
+
+  max-height: 60rem;
+  overflow: scroll;
 }
+
 
 svg {
   background-color: transparent;

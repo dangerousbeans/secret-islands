@@ -17,7 +17,7 @@
       <div class="float-right text-muted small">
         <!-- <timeago v-if="message.value.timestamp" :since="message.value.timestamp" :auto-update="60"></timeago> -->
 
-        <!-- <a class="" @click="raw = !raw">Raw</a> -->
+        
       </div>
       <!-- {{ relatedMessages }} -->
       <!-- <message v-for="mess in relatedMessages" :message="mess">

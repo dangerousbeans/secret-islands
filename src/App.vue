@@ -1,19 +1,14 @@
 <template>
-  <div id="app" class="">
+  <div id="app">
     <router-view></router-view>
   </div>
 </template>
 
 <script>
-// import Messages from './components/Messages.vue'
-// import Map from './components/Map.vue'
-
 
 export default {
   name: 'app',
   components: {
-    // Messages,
-    // Map
   }
 }
 </script>

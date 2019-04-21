@@ -14,7 +14,8 @@
     "ssb-markdown": "^4.1.1",
     "topojson-client": "^3.0.0",
     "vue": "^2.6.10",
-    "vue-router": "^3.0.6"
+    "vue-router": "^3.0.6",
+    "vue-timeago": "^5.1.2"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "^3.6.0",
