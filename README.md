@@ -1,5 +1,6 @@
-# secret-islands
+# Secret Islands
 
+![preview](https://raw.githubusercontent.com/dangerousbeans/secret-islands/master/island.png)
 
 ## Setup
 ```sh
