@@ -1,17 +1,19 @@
 <template>
-  <div id="app" class="container">
-    <!-- <img alt="Vue logo" src="./assets/logo.png"> -->
-    <Messages msg="Welcome to Your Vue.js App"/>
+  <div id="app" class="">
+    <router-view></router-view>
   </div>
 </template>
 
 <script>
-import Messages from './components/Messages.vue'
+// import Messages from './components/Messages.vue'
+// import Map from './components/Map.vue'
+
 
 export default {
   name: 'app',
   components: {
-    Messages
+    // Messages,
+    // Map
   }
 }
 </script>
@@ -22,6 +24,5 @@ export default {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: #2c3e50;
-  margin-top: 60px;
 }
 </style>
