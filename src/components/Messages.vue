@@ -11,9 +11,11 @@
 import Message from "./Message.vue"
 import Composer from "./Composer.vue"
 const pull = require('pull-stream')
+const drain = require('pull-stream/sinks/drain')
 
 import sbotLibs from './../sbot'
 
+const distance = 2
 
 export default {
   name: 'Messages',
@@ -34,9 +36,12 @@ export default {
     y: String
   },
   methods: {
-    messages_loaded: function(err, messages)
+    message_arrived: function(message)
     {
-      this.$data.messages = messages
+      console.log("message_arrived", message)
+      this.$data.messages.push(message)
+    
+      console.log(this.$data.messages)
     },
     name_loaded: function(err, name)
     {
@@ -46,8 +51,6 @@ export default {
 
   mounted: function()
   {
-    console.log(this.$props)
-
     // Async fetch and connect ssb
     this.$ssb.then((ssb) => {
       this.$data.ssb = ssb
@@ -57,34 +60,42 @@ export default {
       var x = parseInt(this.$props.x)
       var y = parseInt(this.$props.y)
 
-      // Load 100 posts from this area
-      pull(
-        ssb.query.read({
-          limit: 100,
-          reverse: true,
-          query: [{
-            $filter: {
-              value: {
-                content: { 
-                  type: 'post',
-                  x: {
-                    $gte: x-2,
-                    $lt: x+2
-                  }, 
-                  y: {
-                    $gte: y-2,
-                    $lt: y+2
-                  }, 
+      var q = {
+        limit: 100,
+        reverse: true,
+        query: [{
+          $filter: {
+            value: {
+              content: { 
+                type: 'post',
+                x: {
+                  $is: "number"
+                }, 
+                y: {
+                  $is: "number"
+                } 
+              },
+            }
+          }}]
+      }
 
-                },
-                
-              }
-            }}]
-        }),
-        
-        // pull.filter(msg => msg.value.content.x === x),
-        // pull.filter(msg => msg.value.content.y === y),
-        pull.collect(this.messages_loaded)
+      // Load 100 posts from this area
+      // From whole map
+      console.log(x,y)
+      if(!isNaN(x) && !isNaN(y))
+      {
+        var c = q.query[0].$filter.value.content
+
+        c.x = { ...c.x, ...{ '$gte': x-distance, '$lte': x+distance } }
+        c.y = { ...c.y, ...{ '$gte': y-distance, '$lte': y+distance } }
+      }
+      var query = ssb.query.read(q)
+
+      console.log(JSON.stringify(q))
+
+      pull(
+        query,
+        pull.drain(this.message_arrived)
       )
   
     } )

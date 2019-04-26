@@ -7,7 +7,7 @@ var config = Config('ssb', {
 	   "ws": [{
 	      "scope": ["device"],
 	      "port": 9000,
-	      "transform": "shs",
+	      "transform": "noauth",
 	      "http": true
 	    }]
 	  },
@@ -21,12 +21,15 @@ var config = Config('ssb', {
 	}
 })
 
-var keys = ssbKeys.loadOrCreateSync("/Users/joran/.ssb/secret")
+// var keys = ssbKeys.loadOrCreateSync("/Users/joran/.ssb/secret")
+var keys = ssbKeys.loadOrCreateSync("secret")
+
 config.keys = keys
+
 
 // add plugins
 Server
-  .use(require('ssb-server/plugins/master'))
+  // .use(require('ssb-server/plugins/master'))
   .use(require('ssb-gossip')) // this causes same error
   .use(require('ssb-replicate'))
   .use(require('ssb-backlinks'))

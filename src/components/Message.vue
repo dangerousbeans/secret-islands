@@ -51,7 +51,7 @@ export default {
     },
     avatar_loaded: function(err, avatar)
     {
-      this.$data.avatar = "http://localhost:9000/blobs/get/" + avatar
+      this.$data.avatar = "http://localhost:8989/blobs/get/" + avatar
     }
   },
 
