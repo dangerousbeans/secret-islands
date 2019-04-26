@@ -3,6 +3,10 @@
     <h1>{{ identity }}</h1>
     
     <Composer :x="$route.params.x" :y="$route.params.y"></Composer>
+
+    <div class="text-center" style="width: 100%">
+      <div v-if="loading" class="spinner-border" label="Spinning"></div>
+    </div>
     <Message v-for="message in messages" :message="message"></Message>
   </div>
 </template>
@@ -27,7 +31,8 @@ export default {
     return {
       ssb: '',
       messages: [],
-      identity: "..."
+      identity: "...",
+      loading: true
     }
   },
   props: {
@@ -39,7 +44,16 @@ export default {
     message_arrived: function(message)
     {
       console.log("message_arrived", message)
-      this.$data.messages.push(message)
+
+      // Ignore sync notification
+      if(message.sync)
+      {
+        this.$data.loading = false
+      }  
+      else
+      {
+        this.$data.messages.push(message)
+      }
     
       console.log(this.$data.messages)
     },
@@ -63,7 +77,7 @@ export default {
       var q = {
         limit: 100,
         reverse: true,
-        
+        live: true,
         query: [{
           $filter: {
             value: {
