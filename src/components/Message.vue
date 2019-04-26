@@ -57,7 +57,7 @@ export default {
 
   mounted: function()
   {
-    this.$data.textmd = md.block(this.message.value.content.text, { toUrl: function( blob ){ return "http://localhost:9000/blobs/get/" + blob } })
+    this.$data.textmd = md.block(this.message.value.content.text, { toUrl: function( blob ){ return "http://localhost:8989/blobs/get/" + blob } })
 
     // Async fetch and connect ssb
     this.$ssb.then((ssb) => {

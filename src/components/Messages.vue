@@ -63,6 +63,7 @@ export default {
       var q = {
         limit: 100,
         reverse: true,
+        
         query: [{
           $filter: {
             value: {
@@ -80,10 +81,9 @@ export default {
       }
 
       // Load 100 posts from this area
-      // From whole map
-      console.log(x,y)
       if(!isNaN(x) && !isNaN(y))
       {
+      
         var c = q.query[0].$filter.value.content
 
         c.x = { ...c.x, ...{ '$gte': x-distance, '$lte': x+distance } }
