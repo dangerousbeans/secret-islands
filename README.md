@@ -7,16 +7,15 @@
 npm install
 ```
 
-
 You need to add your ssb keys to localStorage under 'keys' or it will generate new ones
 
 Inside `main.js` change to match the output from `ssb-server ws.getAddress`
 
 ```javascript
-Vue.use(ssbclient, { keys: localStorage.keys, remote: "ws://localhost:9000~shs:TXKFQehlyoSn8UJAIVP/k2BjFINC591MlBC2e2d24mA=" })
+Vue.use(ssbclient, { keys: localStorage.keys, remote: "ws://localhost:8989~shs:TXKFQehlyoSn8UJAIVP/k2BjFINC591MlBC2e2d24mA=" })
 ```
 
-Run the ssb-server configuration (or similar)
+Run the ssb-server configuration or open [Patchwork](https://github.com/ssbc/patchwork) or [Patchbay](https://github.com/ssbc/patchbay)
 
 ```sh
 node ssb-server.js
