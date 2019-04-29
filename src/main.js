@@ -4,7 +4,12 @@ import router from './router'
 
 import ssbclient from 'vue-ssb'
 
-Vue.use(ssbclient, { keys: localStorage.keys, remote: "ws://localhost:8989~shs:TXKFQehlyoSn8UJAIVP/k2BjFINC591MlBC2e2d24mA=" })
+Vue.use(ssbclient, 
+	{ 
+		keys: localStorage.keys,
+		remote: "ws://localhost:8989~shs:QdWHHh6xi1OlaaRR9GjjXDp+2IiQZElhy+GGNN4zmgY=",
+		key: "QdWHHh6xi1OlaaRR9GjjXDp+2IiQZElhy+GGNN4zmgY=.ed25519" // public key of server
+	})
 
 Vue.config.productionTip = false
 
