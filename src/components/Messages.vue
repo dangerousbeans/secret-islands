@@ -7,7 +7,7 @@
     <div class="text-center" style="width: 100%">
       <div v-if="loading" class="spinner-border" label="Spinning"></div>
     </div>
-    <Message v-for="message in messages" :message="message"></Message>
+    <Message v-for="message in messages" :message="message" v-bind:key="message.key"></Message>
   </div>
 </template>
 
@@ -69,7 +69,7 @@ export default {
     this.$ssb.then((ssb) => {
       this.$data.ssb = ssb
 
-      sbotLibs.displayName(ssb, this.ssb.id, this.name_loaded)
+      sbotLibs.displayName(ssb, localStorage.keys.id, this.name_loaded)
 
       var x = parseInt(this.$props.x)
       var y = parseInt(this.$props.y)
