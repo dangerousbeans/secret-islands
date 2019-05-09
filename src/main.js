@@ -1,6 +1,11 @@
 import Vue from 'vue'
 import app from './App.vue'
 import router from './router'
+import VueTimeago from 'vue-timeago'
+Vue.use(VueTimeago, {
+	locales: {
+    'en': require('date-fns/locale/en'),}
+})
 
 import ssbclient from 'vue-ssb'
 

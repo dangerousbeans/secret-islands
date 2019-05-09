@@ -24,10 +24,6 @@ export default {
     {
       if(this.$data.message)
       {
-        // console.log(this.$data.message)
-        // console.log(this.$props.x)
-        // console.log(this.$props.y)
-
         var x = parseInt(this.$props.x)
         var y = parseInt(this.$props.y)
 
@@ -52,18 +48,6 @@ export default {
               console.log("added!", err, a, b)
             })
           })
-
-
-          // ssb.publish({
-          //   author: localStorage.keys.id,
-          //   type: 'post',
-          //   text: this.$data.message,
-          //   x: x,
-          //   y: y
-          // }, (err, msg) => {
-          //   console.log(err)
-          //   console.log(msg)
-          // })
         })
       }
     },

@@ -15,7 +15,7 @@
       <p v-html="textmd"></p>
 
       <div class="float-right text-muted small">
-        <!-- <timeago v-if="message.value.timestamp" :since="message.value.timestamp" :auto-update="60"></timeago> -->
+        <timeago v-if="message.value.timestamp" :datetime="message.value.timestamp" :auto-update="60"></timeago>
 
         
       </div>
