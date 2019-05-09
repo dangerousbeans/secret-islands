@@ -39,7 +39,7 @@ export default {
 
   data() {
     return {
-      avatar: "http://via.placeholder.com/90x90",
+      avatar: "https://via.placeholder.com/90x90",
       author: "...",
       textmd: "..."
     }
@@ -51,7 +51,8 @@ export default {
     },
     avatar_loaded: function(err, avatar)
     {
-      this.$data.avatar = "http://localhost:8989/blobs/get/" + avatar
+      if(avatar)
+        this.$data.avatar = "http://localhost:8989/blobs/get/" + avatar
     }
   },
 
