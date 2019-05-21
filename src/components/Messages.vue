@@ -43,7 +43,7 @@ export default {
   methods: {
     message_arrived: function(message)
     {
-      console.log("message_arrived", message)
+      // console.log("message_arrived", message)
 
       // Ignore sync notification
       if(message.sync)
@@ -54,8 +54,6 @@ export default {
       {
         this.$data.messages.push(message)
       }
-    
-      console.log(this.$data.messages)
     },
     name_loaded: function(err, name)
     {

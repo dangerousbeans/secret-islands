@@ -62,6 +62,8 @@ export default {
 
     // Async fetch and connect ssb
     this.$ssb.then((ssb) => {
+      // console.log(ssb.getAddress("public", function(err, address) { console.log(address) } ))
+      // debugger
       sbotLibs.displayName(ssb, this.message.value.author, this.name_loaded)
       sbotLibs.avatar(ssb, this.message.value.author, this.avatar_loaded)
       
