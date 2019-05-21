@@ -11,6 +11,7 @@
   "dependencies": {
     "core-js": "^2.6.5",
     "d3": "^5.9.2",
+    "gixi": "github:h2y/gixi",
     "sodium-browserify-tweetnacl": "^0.2.6",
     "ssb-client": "^4.7.2",
     "ssb-markdown": "^4.1.1",

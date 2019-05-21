@@ -30,6 +30,7 @@
 <script>
 import sbotLibs from './../sbot'
 import pull from 'pull-stream'
+import GIXI from 'gixi'
 pull.paraMap = require('pull-paramap')
 var md = require('ssb-markdown')
 
@@ -48,6 +49,10 @@ export default {
     name_loaded: function(err, name)
     {
       this.$data.author = name
+
+      // temporary avatar based on author
+      var imageData = new GIXI(300, name.authorName).getImage();
+      this.$data.avatar = imageData
     },
     avatar_loaded: function(err, avatar)
     {

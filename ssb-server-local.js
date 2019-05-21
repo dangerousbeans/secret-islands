@@ -42,7 +42,6 @@ config.keys = keys
 Server
   .use(require('./ssb-trusting'))
   // .use(require('./ssb-clingy'))
-  // .use(require('ssb-server/plugins/logging'))
   .use(require('ssb-server/plugins/plugins'))
   .use(require('ssb-gossip'))
   .use(require('ssb-replicate'))
