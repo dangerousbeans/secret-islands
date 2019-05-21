@@ -5,7 +5,7 @@
       <MapSVG id="map_svg" :key="map_key"></MapSVG>
     </div>
 
-    <div id="thread_container" class="card" style="width: 33%;">
+    <div id="thread_container" class="container">
       <div class="card-body">
         <h2 class="card-title">{{$route.params.x}} / {{$route.params.y}}</h2>
         <Messages :key="map_key" :x="$route.params.x" :y="$route.params.y"></Messages>
@@ -536,10 +536,11 @@ html, body {
 {
   position: absolute;
   margin-left: 54%;
-  top: 18%;
-
-  max-height: 60rem;
-  overflow: scroll;
+  height: 100%;
+  top: 0;
+  background-color: white;
+  overflow-x: scroll;
+  overflow-y: wrap;
 }
 
 

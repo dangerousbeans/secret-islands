@@ -51,8 +51,11 @@ export default {
       this.$data.author = name
 
       // temporary avatar based on author
-      var imageData = new GIXI(300, name.authorName).getImage();
-      this.$data.avatar = imageData
+      if(this.$data.avatar == "https://via.placeholder.com/90x90")
+      {
+        var imageData = new GIXI(300, name.authorName).getImage();
+        this.$data.avatar = imageData
+      }
     },
     avatar_loaded: function(err, avatar)
     {

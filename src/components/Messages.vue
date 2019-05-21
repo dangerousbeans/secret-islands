@@ -1,6 +1,5 @@
 <template>
   <div class="row">
-    <h1>{{ identity }}</h1>
     
     <Composer :x="$route.params.x" :y="$route.params.y"></Composer>
 
@@ -102,8 +101,6 @@ export default {
         c.y = { ...c.y, ...{ '$gte': y-distance, '$lte': y+distance } }
       }
       var query = ssb.query.read(q)
-
-      console.log(JSON.stringify(q))
 
       pull(
         query,

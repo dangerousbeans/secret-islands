@@ -1,12 +1,16 @@
+
 <template>
-  <div class="form-group">
-    <textarea class="form-control" v-model="message"></textarea>
-    <button type="button" v-on:click='post' class="btn btn-outline-primary">Post</button>
+  <div class="form-group media mt-2 col-sm-6 message">
+    <img class="pr-3 rounded " style="max-width: 60px;" v-bind:src="avatar">
+    <textarea class="form-control" placeholder="New message at this location" v-model="message" v-on:click='writing = true'></textarea>
+    
+    <button type="button" v-if= 'writing' v-on:click='post' class="btn btn-outline-primary">Post</button>
   </div>
 </template>
 
 <script>
 var create = require('ssb-validate').create
+import sbotLibs from './../sbot'
 
 export default {
   name: 'composer',
@@ -16,10 +20,25 @@ export default {
   },
   data() {
     return {
-      message: ''
+      avatar: "https://via.placeholder.com/90x90",
+      message: '',
+      writing: false
     }
   },
+  mounted: function()
+  {
+    // Async fetch and connect ssb
+    this.$ssb.then((ssb) => {
+      sbotLibs.avatar(ssb, JSON.parse(localStorage.keys).id, this.avatar_loaded)
+      
+    })
+  },
   methods: {
+    avatar_loaded: function(err, avatar)
+    {
+      if(avatar)
+        this.$data.avatar = "http://localhost:8989/blobs/get/" + avatar
+    },
     post: function(event)
     {
       if(this.$data.message)
@@ -29,7 +48,9 @@ export default {
 
         this.$ssb.then((ssb) => {
 
-          ssb.getLatest(localStorage.keys.id, (err, data) => {
+          ssb.getLatest(JSON.parse(localStorage.keys).id, (err, data) => {
+            console.log(err)
+            console.log(data)
             var state = data ? {
               id: data.key,
               sequence: data.value.sequence,
