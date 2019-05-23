@@ -1,6 +1,7 @@
 # Secret Islands
 
 ![preview](https://raw.githubusercontent.com/dangerousbeans/secret-islands/master/island.png)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fdangerousbeans%2Fsecret-islands.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fdangerousbeans%2Fsecret-islands?ref=badge_shield)
 
 ## Setup
 ```sh
@@ -43,3 +44,7 @@ npm run build
 - [ ] inital follow (follow the clingy pub to get started)
 - [ ] activity map
 - [ ] SSB City place to put existing non-geocoded activity
+
+
+## License
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fdangerousbeans%2Fsecret-islands.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fdangerousbeans%2Fsecret-islands?ref=badge_large)
