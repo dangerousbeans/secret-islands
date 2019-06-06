@@ -12,7 +12,7 @@ import ssbclient from 'vue-ssb'
 Vue.use(ssbclient, 
 	{ 
 		keys: localStorage.keys,
-		remote: "wss://ssb.guild.land/~shs:+COav7rGgSXqV36bsgYJK1EHtUuk9SvojPFGdIzJLlA="
+		// remote: "wss://ssb.guild.land/~shs:+COav7rGgSXqV36bsgYJK1EHtUuk9SvojPFGdIzJLlA="
 	})
 
 Vue.config.productionTip = false
