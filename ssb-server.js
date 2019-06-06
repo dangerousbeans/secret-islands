@@ -14,8 +14,11 @@ var config = Config('ssb', {
 	      "transform": "shs",
 	      "http": true
 	    }],
-	    "net": [{ "port": 8008, "host": "localhost", "scope": "local", "transform": "noauth" }],
-            "unix": [{ "scope":"local", "transform":"noauth", "server": true }],
+	    "net": [
+		{ "port": 8009, "host": "134.209.101.27", "scope": "device", "transform": "noauth" },
+		{ "scope": "public", "transform": "shs", "port": 8008 },
+	    ],
+            "unix": [{ "scope":"device", "transform":"noauth", "server": true }],
 	  },
 	  "outgoing": {
 	    "net": [{ "transform": "shs" }]
@@ -41,11 +44,12 @@ config.keys = keys
 Server
   .use(require('./ssb-trusting'))
   // .use(require('./ssb-clingy'))
-  // .use(require('ssb-server/plugins/logging'))
+  .use(require('ssb-server/plugins/unix-socket'))
   .use(require('ssb-server/plugins/plugins'))
   .use(require('ssb-gossip'))
   .use(require('ssb-replicate'))
   .use(require('ssb-backlinks'))
+  .use(require('ssb-invite'))
   .use(require('ssb-query'))
   .use(require('ssb-blobs'))
   .use(require('ssb-ws'))
