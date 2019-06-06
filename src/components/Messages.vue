@@ -3,8 +3,9 @@
     
     <Composer :x="$route.params.x" :y="$route.params.y"></Composer>
 
-    <div class="text-center" style="width: 100%">
+    <div class="text-center" >      
     </div>
+
     <div v-if="loading" class="spinner-border" label="Spinning"></div>
 
     <Message v-for="message in messages" :message="message" v-bind:key="message.key"></Message>
@@ -19,7 +20,7 @@ const drain = require('pull-stream/sinks/drain')
 
 import sbotLibs from './../sbot'
 
-const distance = 4
+const distance = 2
 
 export default {
   name: 'Messages',
