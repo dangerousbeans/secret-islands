@@ -15,7 +15,7 @@
       <p v-html="textmd"></p>
 
       <div class="float-right text-muted small">
-        <!-- <timeago v-if="message.value.timestamp" :since="message.value.timestamp" :auto-update="60"></timeago> -->
+        <timeago v-if="message.value.timestamp" :datetime="message.value.timestamp" :auto-update="60"></timeago>
 
         
       </div>
@@ -30,6 +30,7 @@
 <script>
 import sbotLibs from './../sbot'
 import pull from 'pull-stream'
+import GIXI from 'gixi'
 pull.paraMap = require('pull-paramap')
 var md = require('ssb-markdown')
 
@@ -39,7 +40,7 @@ export default {
 
   data() {
     return {
-      avatar: "http://via.placeholder.com/90x90",
+      avatar: "https://via.placeholder.com/90x90",
       author: "...",
       textmd: "..."
     }
@@ -48,10 +49,18 @@ export default {
     name_loaded: function(err, name)
     {
       this.$data.author = name
+
+      // temporary avatar based on author
+      if(this.$data.avatar == "https://via.placeholder.com/90x90")
+      {
+        var imageData = new GIXI(300, name.authorName).getImage();
+        this.$data.avatar = imageData
+      }
     },
     avatar_loaded: function(err, avatar)
     {
-      this.$data.avatar = "http://localhost:8989/blobs/get/" + avatar
+      if(avatar)
+        this.$data.avatar = "http://localhost:8989/blobs/get/" + avatar
     }
   },
 
@@ -61,6 +70,8 @@ export default {
 
     // Async fetch and connect ssb
     this.$ssb.then((ssb) => {
+      // console.log(ssb.getAddress("public", function(err, address) { console.log(address) } ))
+      // debugger
       sbotLibs.displayName(ssb, this.message.value.author, this.name_loaded)
       sbotLibs.avatar(ssb, this.message.value.author, this.avatar_loaded)
       

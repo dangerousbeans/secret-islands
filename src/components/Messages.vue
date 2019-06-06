@@ -1,13 +1,14 @@
 <template>
   <div class="row">
-    <h1>{{ identity }}</h1>
     
     <Composer :x="$route.params.x" :y="$route.params.y"></Composer>
 
-    <div class="text-center" style="width: 100%">
-      <div v-if="loading" class="spinner-border" label="Spinning"></div>
+    <div class="text-center" >      
     </div>
-    <Message v-for="message in messages" :message="message"></Message>
+
+    <div v-if="loading" class="spinner-border" label="Spinning"></div>
+
+    <Message v-for="message in messages" :message="message" v-bind:key="message.key"></Message>
   </div>
 </template>
 
@@ -43,8 +44,6 @@ export default {
   methods: {
     message_arrived: function(message)
     {
-      console.log("message_arrived", message)
-
       // Ignore sync notification
       if(message.sync)
       {
@@ -54,8 +53,6 @@ export default {
       {
         this.$data.messages.push(message)
       }
-    
-      console.log(this.$data.messages)
     },
     name_loaded: function(err, name)
     {
@@ -69,43 +66,45 @@ export default {
     this.$ssb.then((ssb) => {
       this.$data.ssb = ssb
 
-      sbotLibs.displayName(ssb, this.ssb.id, this.name_loaded)
+      sbotLibs.displayName(ssb, localStorage.keys.id, this.name_loaded)
 
       var x = parseInt(this.$props.x)
       var y = parseInt(this.$props.y)
 
       var q = {
-        limit: 100,
+        limit: 50,
         reverse: true,
         live: true,
         query: [{
           $filter: {
             value: {
               content: { 
-                type: 'post',
+                // type: 'post',
                 x: {
-                  $is: "number"
+                  // $is: "number"
                 }, 
                 y: {
-                  $is: "number"
+                  // $is: "number"
                 } 
               },
             }
           }}]
       }
 
-      // Load 100 posts from this area
+      // Load posts from this area
       if(!isNaN(x) && !isNaN(y))
       {
-      
         var c = q.query[0].$filter.value.content
 
-        c.x = { ...c.x, ...{ '$gte': x-distance, '$lte': x+distance } }
-        c.y = { ...c.y, ...{ '$gte': y-distance, '$lte': y+distance } }
+        c.x = { ...c.x, ...{ '$gt': x-distance, '$lt': x+distance } }
+        c.y = { ...c.y, ...{ '$gt': y-distance, '$lt': y+distance } }
       }
-      var query = ssb.query.read(q)
 
-      console.log(JSON.stringify(q))
+      // console.log("query:", q.query[0])
+        
+      var index = ssb.geospatial.read
+
+      var query = index(q)
 
       pull(
         query,
@@ -113,16 +112,6 @@ export default {
       )
   
     } )
-    
-    this.$nextTick(function () {
-      // Code that will run only after the
-      // entire view has been rendered
-    })
   }
 }
 </script>
-
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-
-</style>
