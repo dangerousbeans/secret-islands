@@ -13,8 +13,8 @@ exports.init = (sbot, opts) => {
   console.log("initalizing geoDB")
   var s = sbot._flumeUse(
     'geoDB', 
-    FlumeQuery(2, {indexes:[
-      {key: 'poz', value: [['value', 'content', 'x'], ['value', 'content', 'y']]}
+    FlumeQuery(3, {indexes:[
+      {key: 'pos', value: [['value', 'content', 'x'], ['value', 'content', 'y'], ['value', 'sequence']]}
     ]})
   )
 
