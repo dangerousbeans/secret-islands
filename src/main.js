@@ -12,8 +12,16 @@ import ssbclient from 'vue-ssb'
 Vue.use(ssbclient, 
 	{ 
 		keys: localStorage.keys,
-		remote: "wss://ssb.guild.land/~shs:+COav7rGgSXqV36bsgYJK1EHtUuk9SvojPFGdIzJLlA=",
-		manifest: { geospatial: { read: 'source' } } // Extra functions provided by GeoSpatial FLumeVue Index
+		//remote: "wss://ssb.guild.land/~shs:+COav7rGgSXqV36bsgYJK1EHtUuk9SvojPFGdIzJLlA=",
+		remote: "ws://192.168.0.109:8989~shs:5NWaVfaBIWV9fnXuI8xx+mVRf19m8XlCZkeMwxPyilk=",
+		manifest: { 
+			geospatial: 
+			{ 
+				read: 'source',
+				stream: 'source',
+				get: 'async'
+			} 
+		} // Extra functions provided by GeoSpatial FLumeVue Index
 	})
 
 Vue.config.productionTip = false

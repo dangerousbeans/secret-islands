@@ -1,11 +1,11 @@
 
 <template>
-  <div>
-    <div id="map">
+  <div class="row fluid-container">
+    <div id="map" class="col-md-6">
       <MapSVG id="map_svg" :key="map_key"></MapSVG>
     </div>
 
-    <div id="thread_container" class="container">
+    <div id="" class="col-md-6">
       <div class="card-body">
         <h2 class="card-title">{{$route.params.x}} / {{$route.params.y}}</h2>
         <Messages :key="map_key" :x="$route.params.x" :y="$route.params.y"></Messages>
@@ -32,6 +32,12 @@ const directives = {
   // resize
 }
 
+const pull = require('pull-stream')
+const drain = require('pull-stream/sinks/drain')
+
+import sbotLibs from './../sbot'
+
+
 export default {
 
   directives,
@@ -44,11 +50,16 @@ export default {
   data () {
     return { 
       map_key: 1,
-      messages: [ ]
+      messages: [ ],
+      activity: {},
     }
   },
 
   methods: {
+    new_activity (err, a) {
+      this.$data.activity = a
+      this.inital_draw()
+    },
     getSize () {
       var width = this.$el.clientWidth
       var height = this.$el.clientHeight
@@ -71,6 +82,15 @@ export default {
       layout.optimizeSize(tree, size, this.margin, this.textContraint)
       this.redraw()
     },
+    getActivity: function() {
+      console.log("getActivity")
+      
+      // Async fetch and connect ssb
+      this.$ssb.then((ssb) => {
+        var index = ssb.geospatial.get(this.new_activity)
+      })
+    },
+
     inital_draw: function() {
       console.log("inital_draw")
 
@@ -99,6 +119,8 @@ export default {
         .enter().append("path")
           .attr("d", function(d) { return path(topojson.feature(topology, d)); })
           .attr("class", function(d) { return d.fill ? "fill" : null; })
+          .attr("topics", function(d) { return d.topics })
+          .attr("active", function(d) { return d.topics != "" })
           .on("mousedown", mousedown)
 
       container_container.append("g").append("path")
@@ -139,10 +161,18 @@ export default {
 
         for (var j = 0, q = 3; j < m; ++j, q += 6) {
           for (var i = 0; i < n; ++i, q += 3) {
+            
+            var x_pos = uber_hack_context.$route.params.x
+            var y_pos = uber_hack_context.$route.params.y
+
+            var lookup_activity = i + '/' + j
+
             geometries.push({
               type: "Polygon",
               arcs: [[q, q + 1, q + 2, ~(q + (n + 2 - (j & 1)) * 3), ~(q - 2), ~(q - (n + 2 + (j & 1)) * 3 + 2)]],
-              fill: uber_hack_context.$route.params.x == i && uber_hack_context.$route.params.y == j,
+              fill: x_pos == i && y_pos == j,
+              last_activity: uber_hack_context.$data.activity[lookup_activity],
+              topics: [uber_hack_context.$data.activity[lookup_activity]],
               j: j,
               i: i
             });
@@ -185,19 +215,26 @@ export default {
   
 
   mounted: function() {
-    this.inital_draw()
-    this.redraw()
+    this.getActivity()
+    // this.inital_draw()
   },
   updated: function() {
-
     this.inital_draw()
-    this.redraw()
   }
 }
 </script>
 
 <style>
 
+.message{
+  overflow-y: wrap;
+}
+
+[active~="true"]
+{
+  fill: green;
+  fill-opacity: 0.4;
+}
 
       .reset, html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, b, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, output, ruby, section, summary, time, mark, audio, video {
   margin: 0;
@@ -534,13 +571,13 @@ html, body {
 
 #thread_container
 {
-  position: absolute;
-  margin-left: 54%;
+  /*position: absolute;*/
+  /*margin-left: 54%;*/
   height: 100%;
-  top: 0;
+  
   background-color: white;
-  overflow-x: scroll;
-  overflow-y: wrap;
+  /*overflow-x: scroll;
+  overflow-y: wrap;*/
 }
 
 
@@ -552,10 +589,11 @@ svg {
 #map
 {
   background-image: url('./../assets/fantasy_map_1554102582670.png');
-  background-size: 100%;
-
-  width: 2280px;
-  height: 1960px;
+  background-size: 1960px;
+  /*max-width: 50%;*/
+  overflow: hidden;
+  /*2280px*/
+  /*height: 1960px;*/
 }
 
 .names {

@@ -79,12 +79,12 @@ export default {
           $filter: {
             value: {
               content: { 
-                // type: 'post',
+                type: 'post',
                 x: {
-                  // $is: "number"
+                  $gt: 0
                 }, 
                 y: {
-                  // $is: "number"
+                  $gt: 0
                 } 
               },
             }
