@@ -60,7 +60,7 @@ export default {
     avatar_loaded: function(err, avatar)
     {
       if(avatar)
-        this.$data.avatar = "http://localhost:8989/blobs/get/" + avatar
+        this.$data.avatar = "http://ssb.guild.land/blobs/get/" + avatar
     }
   },
 

@@ -589,9 +589,10 @@ svg {
 #map
 {
   background-image: url('./../assets/fantasy_map_1554102582670.png');
-  background-size: 1960px;
+  background-size: 2289px;
   /*max-width: 50%;*/
   overflow: hidden;
+  background-position-x: 14px;
   /*2280px*/
   /*height: 1960px;*/
 }
