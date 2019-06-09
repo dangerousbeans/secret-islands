@@ -1,9 +1,29 @@
 import pull from 'pull-stream'
 pull.paraMap = require('pull-paramap')
 const { isBlob } = require('ssb-ref')
-
+var create = require('ssb-validate').create
 export default 
 {
+  post_as (ssb, postAs, content, cb) {
+    ssb.getLatest(postAs.id, (err, data) => {
+      console.log(err)
+      console.log(data)
+      var state = data ? {
+        id: data.key,
+        sequence: data.value.sequence,
+        timestamp: data.value.timestamp,
+        queue: []
+      } : {id: null, sequence: null, timestamp: null, queue: []}
+      ssb.add(
+        create(state, postAs, null, content, Date.now()), function (err, a, b) {
+          if(err)
+            throw err
+          console.log("added!", err, a, b)
+        }
+      )
+    })
+  },
+
   displayName (sbot, feedId, cb) {
     var data = {}
 

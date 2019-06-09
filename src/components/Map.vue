@@ -1,17 +1,19 @@
 
 <template>
-  <div class="row fluid-container">
-    <div id="map" class="col-md-6">
-      <MapSVG id="map_svg" :key="map_key"></MapSVG>
-    </div>
+  <div class="fluid-container">
+    <div class="row">
+      <div id="map" class="col-md-6">
+        <MapSVG id="map_svg" :key="map_key"></MapSVG>
+      </div>
 
-    <div id="" class="col-md-6">
-      <div class="card-body">
-        <h2 class="card-title">{{$route.params.x}} / {{$route.params.y}}</h2>
-        <Messages :key="map_key" :x="$route.params.x" :y="$route.params.y"></Messages>
-      </div>  
-    </div>
+      <div id="" class="col-md-6 scroll">
+        <div class="card-body">
+          <h2 class="card-title">{{$route.params.x}} / {{$route.params.y}}</h2>
+          <Messages :key="map_key" :x="$route.params.x" :y="$route.params.y"></Messages>
+        </div>  
+      </div>
 
+    </div>
   </div>
 </template>
 
@@ -58,6 +60,8 @@ export default {
   methods: {
     new_activity (err, a) {
       this.$data.activity = a
+      sessionStorage.activity = JSON.stringify(a)
+      
       this.inital_draw()
     },
     getSize () {
@@ -83,12 +87,17 @@ export default {
       this.redraw()
     },
     getActivity: function() {
-      console.log("getActivity")
-      
       // Async fetch and connect ssb
-      this.$ssb.then((ssb) => {
-        var index = ssb.geospatial.get(this.new_activity)
-      })
+      if(sessionStorage.activity != null)
+      {
+        this.new_activity(null, JSON.parse(sessionStorage.activity))
+      }
+      else
+      {
+        this.$ssb.then((ssb) => {
+          var index = ssb.geospatial.get(this.new_activity)
+        })
+      }
     },
 
     inital_draw: function() {
@@ -216,10 +225,10 @@ export default {
 
   mounted: function() {
     this.getActivity()
-    // this.inital_draw()
+    
   },
   updated: function() {
-    this.inital_draw()
+    this.getActivity()
   }
 }
 </script>
@@ -234,6 +243,12 @@ export default {
 {
   fill: green;
   fill-opacity: 0.4;
+}
+
+.scroll
+{
+  overflow-y: scroll;
+  height: 800px;
 }
 
       .reset, html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, b, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, output, ruby, section, summary, time, mark, audio, video {
@@ -569,17 +584,6 @@ html, body {
 }
 
 
-#thread_container
-{
-  /*position: absolute;*/
-  /*margin-left: 54%;*/
-  height: 100%;
-  
-  background-color: white;
-  /*overflow-x: scroll;
-  overflow-y: wrap;*/
-}
-
 
 svg {
   background-color: transparent;
@@ -595,6 +599,7 @@ svg {
   background-position-x: 14px;
   /*2280px*/
   /*height: 1960px;*/
+  height: 100%;
 }
 
 .names {

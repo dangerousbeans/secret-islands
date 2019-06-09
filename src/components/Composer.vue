@@ -9,8 +9,10 @@
 </template>
 
 <script>
-var create = require('ssb-validate').create
+
 import sbotLibs from './../sbot'
+import GIXI from 'gixi'
+
 
 export default {
   name: 'composer',
@@ -36,6 +38,12 @@ export default {
   methods: {
     avatar_loaded: function(err, avatar)
     {
+      // temporary avatar based on author
+      if(this.$data.avatar == "https://via.placeholder.com/90x90")
+      {
+        var imageData = new GIXI(300, name.authorName).getImage();
+        this.$data.avatar = imageData
+      }
       if(avatar)
         this.$data.avatar = "http://ssb.guild.land/blobs/get/" + avatar
     },
@@ -47,28 +55,14 @@ export default {
         var y = parseInt(this.$props.y)
 
         this.$ssb.then((ssb) => {
+          var content = {
+            type: 'post',
+            text: this.$data.message,
+            x: x,
+            y: y
+          }
 
-          ssb.getLatest(JSON.parse(localStorage.keys).id, (err, data) => {
-            console.log(err)
-            console.log(data)
-            var state = data ? {
-              id: data.key,
-              sequence: data.value.sequence,
-              timestamp: data.value.timestamp,
-              queue: []
-            } : {id: null, sequence: null, timestamp: null, queue: []}
-            ssb.add(create(state, JSON.parse(localStorage.keys), null,           
-              {
-                
-                type: 'post',
-                text: this.$data.message,
-                x: x,
-                y: y
-              }
-              , Date.now()), function (err, a, b) {
-              console.log("added!", err, a, b)
-            })
-          })
+          sbotLibs.post_as(ssb, JSON.parse(localStorage.keys), content)
         })
       }
     },

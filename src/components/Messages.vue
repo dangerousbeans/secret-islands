@@ -22,6 +22,15 @@ import sbotLibs from './../sbot'
 
 const distance = 2
 
+function sort_on_sequence(a, b){
+    var keyA = a.value.timestamp,
+        keyB = b.value.timestamp;
+    // Compare the 2 dates
+    if(keyA < keyB) return 1;
+    if(keyA > keyB) return -1;
+    return 0;
+};
+
 export default {
   name: 'Messages',
   components: {
@@ -52,6 +61,7 @@ export default {
       else
       {
         this.$data.messages.push(message)
+        this.$data.messages.sort(sort_on_sequence)
       }
     },
     name_loaded: function(err, name)

@@ -66,7 +66,7 @@ export default {
 
   mounted: function()
   {
-    this.$data.textmd = md.block(this.message.value.content.text, { toUrl: function( blob ){ return "http://localhost:8989/blobs/get/" + blob } })
+    this.$data.textmd = md.block(this.message.value.content.text, { toUrl: function( blob ){ return "http://ssb.guild.land/blobs/get/" + blob } })
 
     // Async fetch and connect ssb
     this.$ssb.then((ssb) => {
@@ -75,13 +75,6 @@ export default {
       sbotLibs.displayName(ssb, this.message.value.author, this.name_loaded)
       sbotLibs.avatar(ssb, this.message.value.author, this.avatar_loaded)
       
-    })
-
-      
-
-    this.$nextTick(function () {
-      // Code that will run only after the
-      // entire view has been rendered
     })
   },
   
