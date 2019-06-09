@@ -8,7 +8,7 @@
 
       <div id="" class="col-md-6 scroll">
         <div class="card-body">
-          <h2 class="card-title">{{$route.params.x}} / {{$route.params.y}}</h2>
+          <h2 class="card-title">⬡ {{$route.params.x}} / {{$route.params.y}}</h2>
           <Messages :key="map_key" :x="$route.params.x" :y="$route.params.y"></Messages>
         </div>  
       </div>

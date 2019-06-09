@@ -2,9 +2,19 @@
 <template>
   <div class="form-group media mt-2 col-sm-12 message">
     <img class="pr-3 rounded " style="max-width: 60px;" v-bind:src="avatar">
-    <textarea class="form-control" placeholder="New message at this location" v-model="message" v-on:click='writing = true'></textarea>
     
-    <button type="button" v-if= 'writing' v-on:click='post' class="btn btn-outline-primary">Post</button>
+    <form @submit.prevent="post">
+      <textarea class="form-control" placeholder="New message at this location" v-model="message" v-on:click='writing = true'></textarea>
+    
+       <vue-tags-input
+          v-if= 'writing'
+          v-model="tag"
+          :tags="tags"
+          @tags-changed="newTags => tags = newTags"
+        />
+      <button type="submit" v-if= 'writing' class="btn btn-outline-primary">Post</button>
+    </form>
+
   </div>
 </template>
 
@@ -12,7 +22,7 @@
 
 import sbotLibs from './../sbot'
 import GIXI from 'gixi'
-
+import VueTagsInput from '@johmun/vue-tags-input';
 
 export default {
   name: 'composer',
@@ -20,11 +30,16 @@ export default {
     x: String,
     y: String
   },
+  components: {
+    VueTagsInput,
+  },
   data() {
     return {
       avatar: "https://via.placeholder.com/90x90",
       message: '',
-      writing: false
+      writing: false,
+      tag: '', 
+      tags: [],
     }
   },
   mounted: function()
@@ -58,11 +73,13 @@ export default {
           var content = {
             type: 'post',
             text: this.$data.message,
+            // tags: this.$data.tags,
             x: x,
             y: y
           }
 
           sbotLibs.post_as(ssb, JSON.parse(localStorage.keys), content)
+          this.$data.message = ""
         })
       }
     },

@@ -5,7 +5,6 @@
       <h5 class="mt-0">
         <!-- <router-link :to="{ params: { hash: message.value.author }}"><span class="">{{ message.value.author }}</span></router-link> -->
         {{ author.authorName }}
-
         <span class="text-muted">
           {{ message.value.content.type }}
           <span class="text-dark" v-if="message.value.content.channel">#{{ message.value.content.channel }}</span>
@@ -70,11 +69,8 @@ export default {
 
     // Async fetch and connect ssb
     this.$ssb.then((ssb) => {
-      // console.log(ssb.getAddress("public", function(err, address) { console.log(address) } ))
-      // debugger
       sbotLibs.displayName(ssb, this.message.value.author, this.name_loaded)
-      sbotLibs.avatar(ssb, this.message.value.author, this.avatar_loaded)
-      
+      sbotLibs.avatar(ssb, this.message.value.author, this.avatar_loaded)      
     })
   },
   

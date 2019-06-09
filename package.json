@@ -9,6 +9,7 @@
     "ghpages": "./deploy.sh"
   },
   "dependencies": {
+    "@johmun/vue-tags-input": "^2.0.1",
     "core-js": "^2.6.5",
     "d3": "^5.9.2",
     "flumeview-query": "^7.1.1",
