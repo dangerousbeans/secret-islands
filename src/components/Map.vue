@@ -64,12 +64,16 @@ function hexTopology(radius, width, height) {
     }
   }
 
+  var x_pos = map_context.$props.x
+  var y_pos = map_context.$props.y
+
+  console.log("xy", x_pos, y_pos)
+
+
   for (var j = 0, q = 3; j < m; ++j, q += 6) {
     for (var i = 0; i < n; ++i, q += 3) {
       
-      var x_pos = map_context.$route.params.x
-      var y_pos = map_context.$route.params.y
-
+      
       var lookup_activity = i + '/' + j
       var activ = map_context.$data.activity[lookup_activity]
 
@@ -107,6 +111,9 @@ function hexProjection(radius) {
     }
   };
 }
+
+// D3 context hacks for update method
+var group, mesh, border;
 
 export default {
 
@@ -178,13 +185,15 @@ export default {
 
     draw_update: function() {
       console.log("draw_update")
+      var t = d3.transition()
+        .duration(750);
 
       const size = this.getSize()
       const svg = d3.select("#map_svg")
       
       var radius = 20;
 
-      var topology = hexTopology(radius, size.width, size.height);
+      var fresh_topology = hexTopology(radius, size.width, size.height);
       var projection = hexProjection(radius);
       
       // var container_container = svg.select("g")[0]
@@ -194,15 +203,22 @@ export default {
 
       var path = d3.geoPath(projection);
 
-      svg
-        .selectAll("path")
-          .data(topology.objects.hexagons.geometries)
-          .enter()
-          .attr("d", function(d) { return path(topojson.feature(topology, d)); })
-          .attr("class", function(d) { return d.fill ? "fill" : null; })
-          .attr("topics", function(d) { return d.tags })
-          .attr("active", function(d) { return d.last_activity != null })
-          
+      var enter = group
+          .data(fresh_topology.objects.hexagons.geometries)
+          .enter().append("path")
+            .attr("d", function(d) { return path(topojson.feature(fresh_topology, d)); })
+            .attr("class", function(d) { return d.fill ? "fill" : null; })
+            .attr("topics", function(d) { return d.tags })
+            .attr("active", function(d) { return d.last_activity != null })
+            .merge(group)
+            .on("mousedown", mousedown)
+
+      group.exit().remove();
+
+         
+      // console.log("new_stuff", new_stuff) 
+      // console.log("existing_group", group) 
+      // group = group.merge(new_stuff)
       // container.attr("class", "hexagon")
       //   .selectAll("path")
       //     .data(topology.objects.hexagons.geometries)
@@ -228,14 +244,14 @@ export default {
       var path = d3.geoPath(projection);
 
       var container_container = svg.insert("g", "#map_svg")
-      var container = container_container.append("g")
-
-      var group = svg.selectAll("path")
-        .data(topology.objects.hexagons.geometries);
-
-      container.attr("class", "hexagon")
+      group = container_container.append("g").attr("class", "hexagon")
         .selectAll("path")
-          .data(topology.objects.hexagons.geometries)
+        .data(topology.objects.hexagons.geometries)
+
+      // group = svg.selectAll("path")
+      //   .data(topology.objects.hexagons.geometries);
+
+      group
         .enter().append("path")
           .attr("d", function(d) { return path(topojson.feature(topology, d)); })
           .attr("class", function(d) { return d.fill ? "fill" : null; })
@@ -243,12 +259,12 @@ export default {
           .attr("active", function(d) { return d.last_activity != null })
           .on("mousedown", mousedown)
 
-      container_container.append("g").append("path")
+      mesh = container_container.append("g").append("path")
           .datum(topojson.mesh(topology, topology.objects.hexagons))
           .attr("class", "mesh")
           .attr("d", path);
 
-      var border = container_container.append("g").append("path")
+      border = container_container.append("g").append("path")
           .attr("class", "border")
           .call(draw_border, path, topology);
 
