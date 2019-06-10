@@ -70,6 +70,8 @@ function hexTopology(radius, width, height) {
   console.log("xy", x_pos, y_pos)
 
 
+  var geom_id = 1
+
   for (var j = 0, q = 3; j < m; ++j, q += 6) {
     for (var i = 0; i < n; ++i, q += 3) {
       
@@ -84,8 +86,11 @@ function hexTopology(radius, width, height) {
         last_activity: activ ? activ.last_activity : null,
         tags: (activ && activ.tags) ? activ.tags : [],
         j: j,
-        i: i
+        i: i,
+        id: geom_id
       });
+
+      geom_id++;
     }
   }
 
@@ -137,7 +142,6 @@ export default {
   methods: {
     new_activity (err, a) {
       this.$data.activity = a
-      sessionStorage.activity = JSON.stringify(a)
       
       // Check for active tags where we are
       var x = this.$route.params.x
@@ -170,17 +174,10 @@ export default {
       this.redraw()
     },
     getActivity: function(refresh_activity) {
-      // Async fetch and connect ssb
-      if(sessionStorage.activity != null)
-      {
-        this.new_activity(null, JSON.parse(sessionStorage.activity))
-      }
-      else
-      {
-        this.$ssb.then((ssb) => {
-          var index = ssb.geospatial.get(this.new_activity)
-        })
-      }
+      this.$ssb.then((ssb) => {
+        var index = ssb.geospatial.get(this.new_activity)
+      })
+
     },
 
     draw_update: function() {
@@ -196,33 +193,25 @@ export default {
       var fresh_topology = hexTopology(radius, size.width, size.height);
       var projection = hexProjection(radius);
       
-      // var container_container = svg.select("g")[0]
-      // var container = svg.selectAll("path")
-
-      // console.log("container", container)
-
       var path = d3.geoPath(projection);
 
-      var enter = group
+      group.exit().remove();
+
+      var new_stuff = group
           .data(fresh_topology.objects.hexagons.geometries)
-          .enter().append("path")
+          .enter().select("path")
             .attr("d", function(d) { return path(topojson.feature(fresh_topology, d)); })
             .attr("class", function(d) { return d.fill ? "fill" : null; })
             .attr("topics", function(d) { return d.tags })
             .attr("active", function(d) { return d.last_activity != null })
-            .merge(group)
             .on("mousedown", mousedown)
 
-      group.exit().remove();
+      var enter = group
+          .data(fresh_topology.objects.hexagons.geometries)
+          .enter().append("path")
+            
+      group = new_stuff.merge(enter)
 
-         
-      // console.log("new_stuff", new_stuff) 
-      // console.log("existing_group", group) 
-      // group = group.merge(new_stuff)
-      // container.attr("class", "hexagon")
-      //   .selectAll("path")
-      //     .data(topology.objects.hexagons.geometries)
-        
     },
 
     inital_draw: function() {
@@ -246,12 +235,8 @@ export default {
       var container_container = svg.insert("g", "#map_svg")
       group = container_container.append("g").attr("class", "hexagon")
         .selectAll("path")
-        .data(topology.objects.hexagons.geometries)
-
-      // group = svg.selectAll("path")
-      //   .data(topology.objects.hexagons.geometries);
-
-      group
+        
+      group.data(topology.objects.hexagons.geometries)
         .enter().append("path")
           .attr("d", function(d) { return path(topojson.feature(topology, d)); })
           .attr("class", function(d) { return d.fill ? "fill" : null; })
