@@ -16,7 +16,8 @@ export default new VueRouter({
     {
       path: '/:x/:y',
       name: 'Map',
-      component: Map
+      component: Map,
+      props: true
     },
     {
       path: '/profile',

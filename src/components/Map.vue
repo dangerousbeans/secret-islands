@@ -3,13 +3,14 @@
   <div class="fluid-container">
     <div class="row">
       <div id="map" class="col-md-6">
-        <MapSVG id="map_svg" :key="map_key"></MapSVG>
+        <MapSVG id="map_svg"></MapSVG>
       </div>
 
       <div id="" class="col-md-6 scroll">
         <div class="card-body">
-          <h2 class="card-title">⬡ {{$route.params.x}} / {{$route.params.y}}</h2>
-          <Messages :key="map_key" :x="$route.params.x" :y="$route.params.y"></Messages>
+          <h2 class="card-title">⬡ {{x}} / {{y}}</h2>
+          <h3 class="card-title">{{active_tags}}</h3>
+          <Messages :x="x" :y="y"></Messages>
         </div>  
       </div>
 
@@ -28,7 +29,7 @@ import * as topojson from "topojson-client";
 import layout from './circle-layout'
 // import resize from 'vue-resize-directive'
 
-window.uber_hack_context = ""
+window.map_context = ""
 
 const directives = {
   // resize
@@ -40,6 +41,73 @@ const drain = require('pull-stream/sinks/drain')
 import sbotLibs from './../sbot'
 
 
+function mousedown(d) {
+  map_context.$router.push({ path: `/${d.i}/${d.j}`})
+}
+
+function draw_border(border, path, topology) {
+  border.attr("d", path(topojson.mesh(topology, topology.objects.hexagons, function(a, b) { return a.fill ^ b.fill; })));
+}
+
+function hexTopology(radius, width, height) {
+  var dx = radius * 2 * Math.sin(Math.PI / 3),
+      dy = radius * 1.5,
+      m = Math.ceil((height + radius) / dy) + 1,
+      n = Math.ceil(width / dx) + 1,
+      geometries = [],
+      arcs = [];
+
+  for (var j = -1; j <= m; ++j) {
+    for (var i = -1; i <= n; ++i) {
+      var y = j * 2, x = (i + (j & 1) / 2) * 2;
+      arcs.push([[x, y - 1], [1, 1]], [[x + 1, y], [0, 1]], [[x + 1, y + 1], [-1, 1]]);
+    }
+  }
+
+  for (var j = 0, q = 3; j < m; ++j, q += 6) {
+    for (var i = 0; i < n; ++i, q += 3) {
+      
+      var x_pos = map_context.$route.params.x
+      var y_pos = map_context.$route.params.y
+
+      var lookup_activity = i + '/' + j
+      var activ = map_context.$data.activity[lookup_activity]
+
+      geometries.push({
+        type: "Polygon",
+        arcs: [[q, q + 1, q + 2, ~(q + (n + 2 - (j & 1)) * 3), ~(q - 2), ~(q - (n + 2 + (j & 1)) * 3 + 2)]],
+        fill: x_pos == i && y_pos == j,
+        last_activity: activ ? activ.last_activity : null,
+        tags: (activ && activ.tags) ? activ.tags : [],
+        j: j,
+        i: i
+      });
+    }
+  }
+
+  return {
+    transform: {translate: [0, 0], scale: [1, 1]},
+    objects: {hexagons: {type: "GeometryCollection", geometries: geometries}},
+    arcs: arcs
+  };
+}
+
+function hexProjection(radius) {
+  var dx = radius * 2 * Math.sin(Math.PI / 3),
+      dy = radius * 1.5;
+  return {
+    stream: function(stream) {
+      return {
+        point: function(x, y) { stream.point(x * dx / 2, (y - (2 - (y & 1)) / 3) * dy / 2); },
+        lineStart: function() { stream.lineStart(); },
+        lineEnd: function() { stream.lineEnd(); },
+        polygonStart: function() { stream.polygonStart(); },
+        polygonEnd: function() { stream.polygonEnd(); }
+      };
+    }
+  };
+}
+
 export default {
 
   directives,
@@ -49,11 +117,13 @@ export default {
     Messages
   },
 
+  props: ['x', 'y'],
+
   data () {
     return { 
-      map_key: 1,
       messages: [ ],
       activity: {},
+      active_tags: [ ]
     }
   },
 
@@ -62,7 +132,13 @@ export default {
       this.$data.activity = a
       sessionStorage.activity = JSON.stringify(a)
       
-      this.inital_draw()
+      // Check for active tags where we are
+      var x = this.$route.params.x
+      var y = this.$route.params.y
+      if(x && y) // if we have a postion
+      {
+        this.$data.active_tags = a[ x + '/' + y ] ? a[ x + '/' + y ].tags : []
+      }
     },
     getSize () {
       var width = this.$el.clientWidth
@@ -86,7 +162,7 @@ export default {
       layout.optimizeSize(tree, size, this.margin, this.textContraint)
       this.redraw()
     },
-    getActivity: function() {
+    getActivity: function(refresh_activity) {
       // Async fetch and connect ssb
       if(sessionStorage.activity != null)
       {
@@ -100,10 +176,43 @@ export default {
       }
     },
 
+    draw_update: function() {
+      console.log("draw_update")
+
+      const size = this.getSize()
+      const svg = d3.select("#map_svg")
+      
+      var radius = 20;
+
+      var topology = hexTopology(radius, size.width, size.height);
+      var projection = hexProjection(radius);
+      
+      // var container_container = svg.select("g")[0]
+      // var container = svg.selectAll("path")
+
+      // console.log("container", container)
+
+      var path = d3.geoPath(projection);
+
+      svg
+        .selectAll("path")
+          .data(topology.objects.hexagons.geometries)
+          .enter()
+          .attr("d", function(d) { return path(topojson.feature(topology, d)); })
+          .attr("class", function(d) { return d.fill ? "fill" : null; })
+          .attr("topics", function(d) { return d.tags })
+          .attr("active", function(d) { return d.last_activity != null })
+          
+      // container.attr("class", "hexagon")
+      //   .selectAll("path")
+      //     .data(topology.objects.hexagons.geometries)
+        
+    },
+
     inital_draw: function() {
       console.log("inital_draw")
 
-      uber_hack_context = this;
+      map_context = this;
 
       var margin = {top: 5, right: 5, bottom: 5, left: 5},
       width = 2000,
@@ -118,9 +227,11 @@ export default {
       var projection = hexProjection(radius);
       var path = d3.geoPath(projection);
 
-
       var container_container = svg.insert("g", "#map_svg")
       var container = container_container.append("g")
+
+      var group = svg.selectAll("path")
+        .data(topology.objects.hexagons.geometries);
 
       container.attr("class", "hexagon")
         .selectAll("path")
@@ -128,8 +239,8 @@ export default {
         .enter().append("path")
           .attr("d", function(d) { return path(topojson.feature(topology, d)); })
           .attr("class", function(d) { return d.fill ? "fill" : null; })
-          .attr("topics", function(d) { return d.topics })
-          .attr("active", function(d) { return d.topics != "" })
+          .attr("topics", function(d) { return d.tags })
+          .attr("active", function(d) { return d.last_activity != null })
           .on("mousedown", mousedown)
 
       container_container.append("g").append("path")
@@ -139,96 +250,30 @@ export default {
 
       var border = container_container.append("g").append("path")
           .attr("class", "border")
-          .call(draw_border);
+          .call(draw_border, path, topology);
 
-      var mousing = 0;
-
-      function mousedown(d) {
-        uber_hack_context.$router.push({ path: `/${d.i}/${d.j}`})
-
-        uber_hack_context.$data.map_key += 1 
-      }
-
-      function draw_border(border) {
-        border.attr("d", path(topojson.mesh(topology, topology.objects.hexagons, function(a, b) { return a.fill ^ b.fill; })));
-      }
-
-      function hexTopology(radius, width, height) {
-        var dx = radius * 2 * Math.sin(Math.PI / 3),
-            dy = radius * 1.5,
-            m = Math.ceil((height + radius) / dy) + 1,
-            n = Math.ceil(width / dx) + 1,
-            geometries = [],
-            arcs = [];
-
-        for (var j = -1; j <= m; ++j) {
-          for (var i = -1; i <= n; ++i) {
-            var y = j * 2, x = (i + (j & 1) / 2) * 2;
-            arcs.push([[x, y - 1], [1, 1]], [[x + 1, y], [0, 1]], [[x + 1, y + 1], [-1, 1]]);
-          }
-        }
-
-        for (var j = 0, q = 3; j < m; ++j, q += 6) {
-          for (var i = 0; i < n; ++i, q += 3) {
-            
-            var x_pos = uber_hack_context.$route.params.x
-            var y_pos = uber_hack_context.$route.params.y
-
-            var lookup_activity = i + '/' + j
-
-            geometries.push({
-              type: "Polygon",
-              arcs: [[q, q + 1, q + 2, ~(q + (n + 2 - (j & 1)) * 3), ~(q - 2), ~(q - (n + 2 + (j & 1)) * 3 + 2)]],
-              fill: x_pos == i && y_pos == j,
-              last_activity: uber_hack_context.$data.activity[lookup_activity],
-              topics: [uber_hack_context.$data.activity[lookup_activity]],
-              j: j,
-              i: i
-            });
-          }
-        }
-
-        return {
-          transform: {translate: [0, 0], scale: [1, 1]},
-          objects: {hexagons: {type: "GeometryCollection", geometries: geometries}},
-          arcs: arcs
-        };
-      }
-
-      function hexProjection(radius) {
-        var dx = radius * 2 * Math.sin(Math.PI / 3),
-            dy = radius * 1.5;
-        return {
-          stream: function(stream) {
-            return {
-              point: function(x, y) { stream.point(x * dx / 2, (y - (2 - (y & 1)) / 3) * dy / 2); },
-              lineStart: function() { stream.lineStart(); },
-              lineEnd: function() { stream.lineEnd(); },
-              polygonStart: function() { stream.polygonStart(); },
-              polygonEnd: function() { stream.polygonEnd(); }
-            };
-          }
-        };
-      }
     },
-    redraw: function() {
-      console.log("redraw")
+    // redraw: function() {
+    //   console.log("redraw")
       
-    },
-    location_redraw: function() {
-      console.log("location redraw")
+    // },
+    // location_redraw: function() {
+    //   console.log("location redraw")
       
-    }
+    // }
   },
 
-  
-
   mounted: function() {
+    this.inital_draw()
     this.getActivity()
     
   },
   updated: function() {
-    this.getActivity()
+    this.draw_update()
+
+    this.$data.x
+    this.$data.y
+    // this.getActivity(false)
   }
 }
 </script>

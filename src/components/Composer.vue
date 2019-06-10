@@ -47,7 +47,6 @@ export default {
     // Async fetch and connect ssb
     this.$ssb.then((ssb) => {
       sbotLibs.avatar(ssb, JSON.parse(localStorage.keys).id, this.avatar_loaded)
-      
     })
   },
   methods: {
@@ -69,14 +68,19 @@ export default {
         var x = parseInt(this.$props.x)
         var y = parseInt(this.$props.y)
 
+        console.log(this.$data.tags)
+
         this.$ssb.then((ssb) => {
           var content = {
             type: 'post',
             text: this.$data.message,
-            // tags: this.$data.tags,
             x: x,
             y: y
           }
+
+          // If there are tags, map their names onto the new post
+          if(this.$data.tags.length > 0)
+            content.tags = this.$data.tags.map(x => x.text)
 
           sbotLibs.post_as(ssb, JSON.parse(localStorage.keys), content)
           this.$data.message = ""

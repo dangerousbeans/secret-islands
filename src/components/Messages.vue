@@ -1,10 +1,6 @@
 <template>
   <div class="row">
-    
     <Composer :x="$route.params.x" :y="$route.params.y"></Composer>
-
-    <div class="text-center" >      
-    </div>
 
     <div v-if="loading" class="spinner-border" label="Spinning"></div>
 

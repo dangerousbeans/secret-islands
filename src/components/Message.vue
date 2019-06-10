@@ -3,10 +3,11 @@
     <img class="pr-3 rounded " style="max-width: 60px;" v-bind:src="avatar">
     <div class="media-body">
       <h5 class="mt-0">
-        <!-- <router-link :to="{ params: { hash: message.value.author }}"><span class="">{{ message.value.author }}</span></router-link> -->
         {{ author.authorName }}
         <span class="text-muted">
-          {{ message.value.content.type }}
+          <template v-if="message.value.content.tags">
+            {{ message.value.content.tags.join(", ") }}
+          </template>
           <span class="text-dark" v-if="message.value.content.channel">#{{ message.value.content.channel }}</span>
         </span>
       </h5>
