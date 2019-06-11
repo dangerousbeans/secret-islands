@@ -52,7 +52,7 @@ var radius = 20;
 // D3 context hacks for update method
 var group, mesh, border;
 
-var svg, g, path;
+var svg, g, path, container_container;
 
 function mousedown(d) {
   map_context.$router.push({ path: `/${d.i}/${d.j}`})
@@ -80,7 +80,7 @@ function hexTopology(radius, width, height) {
   var x_pos = map_context.$props.x
   var y_pos = map_context.$props.y
 
-  console.log("xy", x_pos, y_pos)
+  // console.log("xy", x_pos, y_pos)
 
   var geom_id = 1
   for (var j = 0, q = 3; j < m; ++j, q += 6) {
@@ -161,8 +161,8 @@ export default {
       }
     },
     getSize () {
-      var width = this.$el.clientWidth
-      var height = this.$el.clientHeight
+      var width = 2270
+      var height = 1300
       return { width, height }
     },
     transformSvg (g, size) {
@@ -190,70 +190,27 @@ export default {
       })
     },
 
-    inital_draw: function() {
-      console.log("inital_draw")
+    // zoomed: function() {
+    //   console.log("zoom", d3.event.transform, container_container.attr("transform"))
 
-      map_context = this;
+    //   container_container.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+    //   // container_container.attr("transform", d3.event.transform);
+    // },
 
-      var size = this.getSize()
-      var svg = d3.select("#map_svg")
-      
-
-      var topology = hexTopology(radius, size.width, size.height);
-      var projection = hexProjection(radius);
-      var path = d3.geoPath(projection);
-
-      var container_container = svg.insert("g", "#map_svg")
-      group = container_container.append("g").attr("class", "hexagon")
-        
-        
-      group.selectAll("path").data(topology.objects.hexagons.geometries)
-        .enter().append("path")
-          .attr("d", function(d) { return path(topojson.feature(topology, d)); })
-          .attr("class", function(d) { return d.fill ? "fill" : null; })
-          .attr("topics", function(d) { return d.tags })
-          .attr("active", function(d) { return d.last_activity != null })
-          .on("mousedown", mousedown)
-
-      mesh = container_container.append("g").append("path")
-          .datum(topojson.mesh(topology, topology.objects.hexagons))
-          .attr("class", "mesh")
-          .attr("d", path);
-
-      border = container_container.append("g").append("path")
-          .attr("class", "border")
-          .call(draw_border, path, topology);
-
+    dragstarted: function (d) {
+      d3.event.sourceEvent.stopPropagation();
     },
 
-    draw_update: function() {
-      console.log("draw_update")
-      map_context = this;
-      var t = d3.transition()
-        .duration(750);
+    dragged: function (d) {
+      // console.log("dragg", container_container.attr("transform"))
 
-      var size = this.getSize()
-      var svg = d3.select("#map_svg")
-      
-      var radius = 20;
+      d.x = d3.event.x;
+      d.y = d3.event.y;
 
-      var fresh_topology = hexTopology(radius, size.width, size.height);
-      var projection = hexProjection(radius);
-      
-      var path = d3.geoPath(projection);
+      container_container.attr("transform", "translate(" + [d.x, d.y] + ")")
+    },
 
-      group.exit().remove();
-
-      group.select("path")
-          .data(fresh_topology.objects.hexagons.geometries)
-          .enter().append("path")
-            .attr("d", function(d) { return path(topojson.feature(fresh_topology, d)); })
-            .attr("class", function(d) { return d.fill ? "fill" : null; })
-            .attr("topics", function(d) { return d.tags })
-            .attr("active", function(d) { return d.last_activity != null })
-            .on("mousedown", mousedown)
-            .merge(group)
-            
+    dragended: function (d) {
     },
 
     update_backgrounds: function(paths, topology) {
@@ -312,7 +269,11 @@ export default {
 
   mounted: function() {
     // Setup d3 stuff
-    var svg = d3.select("#map_svg"),
+    var margin = {top: -5, right: -5, bottom: -5, left: -5}
+    var svg = d3.select("#map_svg").append("g")
+      .attr("transform", "translate(" + margin.left + "," + margin.right + ")")
+      .attr("class", "wrapper")
+      .data([{x: 0, y: 0}]);
     width = +svg.attr("width"),
     height = +svg.attr("height")
 
@@ -326,8 +287,34 @@ export default {
     var projection = hexProjection(radius);
     var path = d3.geoPath(projection);
 
-    var container_container = svg.insert("g", "#map_svg")
-    g = container_container.append("g").attr("class", "hexagon")
+    container_container = svg
+
+    // var zoom = d3.zoom()
+    //   .scaleExtent([0.5, 3])
+    //   .on("zoom", this.zoomed);
+
+    var drag = d3.drag()
+      // .container(svg)
+      .on("start", this.dragstarted)
+      .on("drag", this.dragged)
+      .on("end", this.dragended);
+
+    svg
+      .call(drag)
+      // .call(zoom)
+
+    // Add map visuals
+    // ./../assets/fantasy_map_1554102582670.png
+    var imgs = container_container.selectAll("image").data([0]);
+    imgs.enter()
+      .append("svg:image")
+      .attr('x', 0)
+      .attr('y', 0)
+      .attr('width', 2280)
+      // .attr('height', 200)
+      .attr("xlink:href", require("./../assets/fantasy_map_1554102582670.png"))
+
+    g = container_container.append("g").attr("class", "hexagon");
     
     mesh = container_container.append("g").append("path")
       .datum(topojson.mesh(topology, topology.objects.hexagons))
@@ -345,12 +332,9 @@ export default {
   updated: function() {
     console.log("update")
 
-    var t = d3.transition()
-    .duration(750);
+    // var t = d3.transition()
+    // .duration(750);
 
-    // D3 update
-    // DATA JOIN
-    // Join new data with old elements, if any.
     var size = this.getSize()
     var data = hexTopology(radius, size.width, size.height);
     
@@ -365,14 +349,26 @@ export default {
     this.update_backgrounds(paths, topology)
 
     this.update_borders(border, topology)
-    // this.$data.x
-    // this.$data.y
-    // this.getActivity(false)
   }
 }
 </script>
 
 <style>
+
+/*g .hexagon
+{
+  background-image: url('./../assets/fantasy_map_1554102582670.png');
+  background-size: 2289px;
+  
+}*/
+
+/* small display mode */
+@media (max-width: 500px){
+  #map
+  {
+    height: 15rem !important;
+  }
+}
 
 .message{
   overflow-y: wrap;
@@ -731,8 +727,6 @@ svg {
 
 #map
 {
-  background-image: url('./../assets/fantasy_map_1554102582670.png');
-  background-size: 2289px;
   /*max-width: 50%;*/
   overflow: hidden;
   background-position-x: 14px;
