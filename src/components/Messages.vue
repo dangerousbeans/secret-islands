@@ -14,7 +14,7 @@ import Composer from "./Composer.vue"
 const pull = require('pull-stream')
 const drain = require('pull-stream/sinks/drain')
 var Abortable = require('pull-abortable')
-var abortable = Abortable()
+var abortable
 
 import sbotLibs from './../sbot'
 
@@ -48,6 +48,11 @@ export default {
     x: String,
     y: String
   },
+  computed: {
+    position() {
+      return this.x, this.y
+    }
+  },
   methods: {
     message_arrived: function(message)
     {
@@ -69,13 +74,9 @@ export default {
 
     fetch_messages: function()
     {
-      this.$data.messages = []
+      this.$data.messages = [] // clear
       this.$data.loading = true
 
-      if(this.$data.loading)
-        abortable.abort() // incase we were already loading stuff
-
-      // Async fetch and connect ssb
       this.$ssb.then((ssb) => {
         this.$data.ssb = ssb
 
@@ -104,7 +105,7 @@ export default {
             }}]
         }
 
-        // Load posts from this area
+        // filter posts from this area
         if(!isNaN(x) && !isNaN(y))
         {
           var c = q.query[0].$filter.value.content
@@ -113,15 +114,12 @@ export default {
           c.y = { ...c.y, ...{ '$gt': y-distance, '$lt': y+distance } }
         }
 
-        // console.log("query:", q.query[0])
-          
         var index = ssb.geospatial.read
-
         var query = index(q)
 
         pull(
           query,
-          // abortable,
+          abortable = Abortable(), // incase we need to bail midway through
           pull.drain(this.message_arrived)
         )
     
@@ -130,12 +128,11 @@ export default {
   },
 
   watch: {
-      x: function(val, oldVal) {
-        this.fetch_messages()
-      },
-      y: function(val, oldVal) {
-        this.fetch_messages()
-      }
+    // if the position moves, load new messages
+    position() {
+      abortable.abort()
+      this.fetch_messages()
+    }
   },
 
   mounted: function()

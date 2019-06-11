@@ -1,5 +1,5 @@
-<template>
-  <div class="media mt-3 col-sm-12 message">
+<template><!-- v-bind:class="distant" -->
+  <div class="media mt-3 col-sm-12 message" >
     <img class="pr-3 rounded " style="max-width: 60px;" v-bind:src="avatar">
     <div class="media-body">
       <h5 class="mt-0">
@@ -45,6 +45,14 @@ export default {
       textmd: "..."
     }
   },
+  // computed: {
+  //   distant: function () {
+  //     return {
+  //       distant: (parseInt(this.$props.message.x) != parseInt(this.$route.params.x)) && 
+  //       (parseInt(this.$props.message.y) != parseInt(this.$route.params.y)),
+  //     }
+  //   }
+  // },
   methods: {
     name_loaded: function(err, name)
     {
@@ -80,8 +88,9 @@ export default {
 
 <style scoped>
 
-.media-body
+.distant
 {
+  color: grey;
 }
 
 img {
