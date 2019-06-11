@@ -41,6 +41,17 @@ const drain = require('pull-stream/sinks/drain')
 import sbotLibs from './../sbot'
 
 
+// D3 settings
+var margin = {top: 5, right: 5, bottom: 5, left: 5},
+      width = 2000,
+      height = 2000
+
+
+var radius = 20;
+
+// D3 context hacks for update method
+var group, mesh, border;
+
 function mousedown(d) {
   map_context.$router.push({ path: `/${d.i}/${d.j}`})
 }
@@ -69,9 +80,7 @@ function hexTopology(radius, width, height) {
 
   console.log("xy", x_pos, y_pos)
 
-
   var geom_id = 1
-
   for (var j = 0, q = 3; j < m; ++j, q += 6) {
     for (var i = 0; i < n; ++i, q += 3) {
       
@@ -117,9 +126,6 @@ function hexProjection(radius) {
   };
 }
 
-// D3 context hacks for update method
-var group, mesh, border;
-
 export default {
 
   directives,
@@ -146,6 +152,7 @@ export default {
       // Check for active tags where we are
       var x = this.$route.params.x
       var y = this.$route.params.y
+
       if(x && y) // if we have a postion
       {
         this.$data.active_tags = a[ x + '/' + y ] ? a[ x + '/' + y ].tags : []
@@ -173,15 +180,90 @@ export default {
       layout.optimizeSize(tree, size, this.margin, this.textContraint)
       this.redraw()
     },
+
+
     getActivity: function(refresh_activity) {
       this.$ssb.then((ssb) => {
         var index = ssb.geospatial.get(this.new_activity)
       })
+    },
+
+    inital_d3_setup: function() {
+      var svg = d3.select("svg"),
+      width = +svg.attr("width"),
+      height = +svg.attr("height"),
+      g = svg.append("g").attr("transform", "translate(32," + (height / 2) + ")");
+
+    },
+
+    d3_update: function(data) {
+      // DATA JOIN
+      // Join new data with old elements, if any.
+      var text = g.selectAll("text")
+        .data(data);
+
+      // UPDATE
+      // Update old elements as needed.
+      text.attr("class", "update");
+
+      // ENTER
+      // Create new elements as needed.
+      //
+      // ENTER + UPDATE
+      // After merging the entered elements with the update selection,
+      // apply operations to both.
+      text.enter().append("text")
+          .attr("class", "enter")
+          .attr("x", function(d, i) { return i * 32; })
+          .attr("dy", ".35em")
+        .merge(text)
+          .text(function(d) { return d; });
+
+      // EXIT
+      // Remove old elements as needed.
+      text.exit().remove();
+    },
+
+
+    inital_draw: function() {
+      console.log("inital_draw")
+
+      map_context = this;
+
+      const size = this.getSize()
+      const svg = d3.select("#map_svg")
+      
+
+      var topology = hexTopology(radius, size.width, size.height);
+      var projection = hexProjection(radius);
+      var path = d3.geoPath(projection);
+
+      var container_container = svg.insert("g", "#map_svg")
+      group = container_container.append("g").attr("class", "hexagon")
+        .selectAll("path")
+        
+      group.data(topology.objects.hexagons.geometries)
+        .enter().append("path")
+          .attr("d", function(d) { return path(topojson.feature(topology, d)); })
+          .attr("class", function(d) { return d.fill ? "fill" : null; })
+          .attr("topics", function(d) { return d.tags })
+          .attr("active", function(d) { return d.last_activity != null })
+          .on("mousedown", mousedown)
+
+      mesh = container_container.append("g").append("path")
+          .datum(topojson.mesh(topology, topology.objects.hexagons))
+          .attr("class", "mesh")
+          .attr("d", path);
+
+      border = container_container.append("g").append("path")
+          .attr("class", "border")
+          .call(draw_border, path, topology);
 
     },
 
     draw_update: function() {
       console.log("draw_update")
+      map_context = this;
       var t = d3.transition()
         .duration(750);
 
@@ -214,46 +296,7 @@ export default {
 
     },
 
-    inital_draw: function() {
-      console.log("inital_draw")
-
-      map_context = this;
-
-      var margin = {top: 5, right: 5, bottom: 5, left: 5},
-      width = 2000,
-      height = 2000
-      
-      const size = this.getSize()
-      const svg = d3.select("#map_svg")
-      
-      var radius = 20;
-
-      var topology = hexTopology(radius, size.width, size.height);
-      var projection = hexProjection(radius);
-      var path = d3.geoPath(projection);
-
-      var container_container = svg.insert("g", "#map_svg")
-      group = container_container.append("g").attr("class", "hexagon")
-        .selectAll("path")
-        
-      group.data(topology.objects.hexagons.geometries)
-        .enter().append("path")
-          .attr("d", function(d) { return path(topojson.feature(topology, d)); })
-          .attr("class", function(d) { return d.fill ? "fill" : null; })
-          .attr("topics", function(d) { return d.tags })
-          .attr("active", function(d) { return d.last_activity != null })
-          .on("mousedown", mousedown)
-
-      mesh = container_container.append("g").append("path")
-          .datum(topojson.mesh(topology, topology.objects.hexagons))
-          .attr("class", "mesh")
-          .attr("d", path);
-
-      border = container_container.append("g").append("path")
-          .attr("class", "border")
-          .call(draw_border, path, topology);
-
-    },
+    
     // redraw: function() {
     //   console.log("redraw")
       
