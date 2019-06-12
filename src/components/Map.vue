@@ -155,7 +155,10 @@ export default {
     Messages
   },
 
-  props: ['x', 'y'],
+  props: {
+    x: {type: String, default: "4"},
+    y: {type: String, default: "21"}
+  },
 
   data () {
     return { 
@@ -186,6 +189,7 @@ export default {
     },
 
     new_activity (err, a) {
+      console.log("new_activity")
       this.$data.activity = a
       
       // Check for active tags where we are
@@ -196,6 +200,25 @@ export default {
       {
         this.$data.active_tags = a[ x + '/' + y ] ? a[ x + '/' + y ].tags : []
       }
+
+      // d3 update stuff
+      var size = this.getSize()
+      var data = hexTopology(radius, size.width, size.height);
+      
+      var topology = hexTopology(radius, size.width, size.height);
+      var projection = hexProjection(radius);
+
+      path = d3.geoPath(projection);
+
+      var paths = g.selectAll("path")
+        .data(topology.objects.hexagons.geometries)
+
+      var labels_to_update = labels.selectAll("text")
+        .data(topology.objects.hexagons.geometries)
+
+      this.update_backgrounds(paths, topology)
+      this.update_labels(labels_to_update, topology)
+      this.update_borders(border, topology)
     },
     getSize () {
       var width = 2270
@@ -222,6 +245,7 @@ export default {
 
 
     getActivity: function(refresh_activity) {
+      console.log("getActivity")
       this.$ssb.then((ssb) => {
         var index = ssb.geospatial.get(this.new_activity)
       })
@@ -415,7 +439,15 @@ export default {
       // .attr("d", path)
       .attr("class", "label")
       .call(draw_label, path, topology);
-      
+    
+    // Hack for if we dont have a position
+    // Dump them in aligator city
+    // if(!this.$route.params.x && !this.$route.params.y)
+    // {
+    //   this.$route.params.x = "4"
+    //   this.$route.params.x = "21"
+    // }
+
     this.getActivity()
     
     // this.inital_draw()
@@ -431,23 +463,7 @@ export default {
     // var t = d3.transition()
     // .duration(750);
 
-    var size = this.getSize()
-    var data = hexTopology(radius, size.width, size.height);
     
-    var topology = hexTopology(radius, size.width, size.height);
-    var projection = hexProjection(radius);
-
-    path = d3.geoPath(projection);
-
-    var paths = g.selectAll("path")
-      .data(topology.objects.hexagons.geometries)
-
-    var labels_to_update = labels.selectAll("text")
-      .data(topology.objects.hexagons.geometries)
-
-    this.update_backgrounds(paths, topology)
-    this.update_labels(labels_to_update, topology)
-    this.update_borders(border, topology)
   }
 }
 </script>
