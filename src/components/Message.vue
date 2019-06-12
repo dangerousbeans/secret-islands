@@ -61,7 +61,7 @@ export default {
       // temporary avatar based on author
       if(this.$data.avatar == "https://via.placeholder.com/90x90")
       {
-        var imageData = new GIXI(300, name.authorName).getImage();
+        var imageData = new GIXI(300, this.message.value.author).getImage();
         this.$data.avatar = imageData
       }
     },
