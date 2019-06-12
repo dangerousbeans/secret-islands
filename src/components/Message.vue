@@ -5,9 +5,9 @@
       <h5 class="mt-0">
         {{ author.authorName }}
         <span class="text-muted">
-          <template v-if="message.value.content.tags">
-            {{ message.value.content.tags.join(", ") }}
-          </template>
+          <span v-for="tag in message.value.content.tags">
+            {{ tag }}
+          </span>
           <span class="text-dark" v-if="message.value.content.channel">#{{ message.value.content.channel }}</span>
         </span>
       </h5>

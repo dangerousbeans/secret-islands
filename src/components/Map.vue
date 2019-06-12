@@ -9,8 +9,12 @@
       <div id="" class="col-md-6 scroll">
         <div class="card-body">
           <h2 class="card-title">⬡ {{x}} / {{y}}</h2>
-          <h3 class="card-title">{{active_tags}}</h3>
-          <Messages :x="x" :y="y"></Messages>
+
+          <span v-for="tag in active_tags">
+            {{ tag }}
+          </span>
+          <!-- <h3 class="card-title">{{active_tags}}</h3> -->
+          <Messages @new_post="handle_new_post" v-bind:this_tile_tags="active_tags" :x="x" :y="y"></Messages>
         </div>  
       </div>
 
@@ -50,7 +54,7 @@ var margin = {top: 5, right: 5, bottom: 5, left: 5},
 var radius = 20;
 
 // D3 context hacks for update method
-var group, mesh, border;
+var group, mesh, border, labels;
 
 var svg, g, path, container_container;
 
@@ -60,6 +64,17 @@ function mousedown(d) {
 
 function draw_border(border, path, topology) {
   border.attr("d", path(topojson.mesh(topology, topology.objects.hexagons, function(a, b) { return a.fill ^ b.fill; })));
+}
+
+function draw_label(labels, path, topology) {
+  // console.log("draw_label", labels)
+
+  
+  labels
+    .attr("font-size", 20)
+    .attr("font-family", "monospace")
+   
+  return labels
 }
 
 function hexTopology(radius, width, height) {
@@ -101,13 +116,16 @@ function hexTopology(radius, width, height) {
         id: geom_id
       });
 
+      // if(activ && activ.tags.length > 0)
+      //   console.log(activ)
+
       geom_id++;
     }
   }
 
   return {
     transform: {translate: [0, 0], scale: [1, 1]},
-    objects: {hexagons: {type: "GeometryCollection", geometries: geometries}},
+    objects: { hexagons: {type: "GeometryCollection", geometries: geometries} },
     arcs: arcs
   };
 }
@@ -147,7 +165,26 @@ export default {
     }
   },
 
+  computed: {
+    position() {
+      return this.$route.params.x, this.$route.params.y
+    }
+  },
+
+  watch: {
+    // if the position moves, load new messages
+    position() {
+      this.getActivity()
+    }
+  },
+
   methods: {
+    handle_new_post () {
+      console.log("handle_new_post")
+      this.$forceUpdate()
+      this.getActivity()
+    },
+
     new_activity (err, a) {
       this.$data.activity = a
       
@@ -202,8 +239,6 @@ export default {
     },
 
     dragged: function (d) {
-      // console.log("dragg", container_container.attr("transform"))
-
       d.x = d3.event.x;
       d.y = d3.event.y;
 
@@ -213,15 +248,32 @@ export default {
     dragended: function (d) {
     },
 
+    // For a given activity timestamp, fade it out based on how long ago it was
+    activity_to_alpha: function(d) {
+      if(d.last_activity == null)
+        return
+
+      // Time difference
+      var difference = Date.now() - d.last_activity
+
+      // max age
+      var max = 86400 * 7 // 1 week
+      // console.log(max / difference)
+
+      return Math.min( Math.max( max / difference, 0.1 ), 0.4) // so you can still see small things
+    },
+
+    apply_attributes: function(paths, topology) {
+      return paths
+        .attr("d", function(d) { return path(topojson.feature(topology, d)) })
+        .attr("fill-opacity", function(d) { return map_context.activity_to_alpha(d) })
+        .style("fill", function(d) { return d.last_activity != null ? "Green" : null })
+        .on("click", mousedown)
+    },
+
     update_backgrounds: function(paths, topology) {
       // UPDATE
-      // Update old elements as needed.
-      paths.attr("class", "update")
-        .attr("d", function(d) { return path(topojson.feature(topology, d)); })
-        .attr("class", function(d) { return d.fill ? "fill" : null; })
-        .attr("topics", function(d) { return d.tags })
-        .attr("active", function(d) { return d.last_activity != null })
-        .on("mousedown", mousedown)
+      this.apply_attributes(paths, topology)
 
       // ENTER
       // Create new elements as needed.
@@ -229,12 +281,9 @@ export default {
       // ENTER + UPDATE
       // After merging the entered elements with the update selection,
       // apply operations to both.
-      paths.enter().append("path")
-        .attr("d", function(d) { return path(topojson.feature(topology, d)); })
-        .attr("class", function(d) { return d.fill ? "fill" : null; })
-        .attr("topics", function(d) { return d.tags })
-        .attr("active", function(d) { return d.last_activity != null })
-        .on("mousedown", mousedown)
+      this.apply_attributes(
+          paths.enter().append("path"), topology
+        )
         .merge(paths)
 
       // EXIT
@@ -264,6 +313,44 @@ export default {
       // EXIT
       // Remove old elements as needed.
       borders.exit().remove();
+    },
+
+
+
+    update_labels: function(labels, topology) {
+      // border = container_container.append("g").append("path")
+      //     .attr("class", "border")
+      //     .call(draw_border, path, topology);
+      // UPDATE
+      // Update old elements as needed.
+      labels.attr("class", "label")
+        .text(function(d) {
+          return d.tags.join(', ');
+        })
+        .attr('transform', function(d) {
+          return 'translate(' + d.i * 30 + ',' + d.j * 30 + ')';
+        })
+        .call(draw_label, path, topology);
+
+      // ENTER
+      // Create new elements as needed.
+      //
+      // ENTER + UPDATE
+      // After merging the entered elements with the update selection,
+      // apply operations to both.
+      labels.enter().append("text")
+        .attr("class", "label")
+        .text(function(d) {
+          return d.tags.join(', ');
+        })
+        .attr('transform', function(d) {
+          return 'translate(' + d.i * 30 + ',' + d.j * 30 + ')';
+        })
+        .call(draw_label, path, topology);
+
+      // EXIT
+      // Remove old elements as needed.
+      labels.exit().remove();
     }
   },
 
@@ -274,6 +361,7 @@ export default {
       .attr("transform", "translate(" + margin.left + "," + margin.right + ")")
       .attr("class", "wrapper")
       .data([{x: 0, y: 0}]);
+
     width = +svg.attr("width"),
     height = +svg.attr("height")
 
@@ -304,7 +392,6 @@ export default {
       // .call(zoom)
 
     // Add map visuals
-    // ./../assets/fantasy_map_1554102582670.png
     var imgs = container_container.selectAll("image").data([0]);
     imgs.enter()
       .append("svg:image")
@@ -321,16 +408,27 @@ export default {
       .attr("class", "mesh")
       .attr("d", path);
 
-    border = container_container.append("g").append("path")
+    border = container_container.append("g").attr("class", "border").append("path")
       .attr("class", "border")
       .call(draw_border, path, topology);
+
+    labels = container_container.append("g").attr("class", "labels")
+      .datum(topojson.mesh(topology, topology.objects.hexagons))
+      // .attr("d", path)
+      .attr("class", "label")
+      .call(draw_label, path, topology);
       
-    // this.inital_draw()
     this.getActivity()
+    
+    // this.inital_draw()
+    // this.getActivity()
     
   },
   updated: function() {
     console.log("update")
+
+    // this.getActivity()
+    
 
     // var t = d3.transition()
     // .duration(750);
@@ -346,8 +444,11 @@ export default {
     var paths = g.selectAll("path")
       .data(topology.objects.hexagons.geometries)
 
-    this.update_backgrounds(paths, topology)
+    var labels_to_update = labels.selectAll("text")
+      .data(topology.objects.hexagons.geometries)
 
+    this.update_backgrounds(paths, topology)
+    this.update_labels(labels_to_update, topology)
     this.update_borders(border, topology)
   }
 }
@@ -368,6 +469,21 @@ export default {
   {
     height: 15rem !important;
   }
+}
+
+/*stop pointer events on labels*/
+text.label { 
+  color: gray;
+  paint-order: stroke;
+  stroke: #FFF;
+  stroke-width: 2px;
+  stroke-linecap: butt;
+  stroke-linejoin: miter;
+
+  pointer-events: none; 
+
+  font-size: 10pt;
+  opacity: 0.8;
 }
 
 .message{

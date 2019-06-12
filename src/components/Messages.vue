@@ -1,6 +1,6 @@
 <template>
   <div class="row">
-    <Composer :x="$route.params.x" :y="$route.params.y"></Composer>
+    <Composer @new_post="new_post" :active_tags="this_tile_tags" :x="$route.params.x" :y="$route.params.y"></Composer>
 
     <div v-if="loading" class="spinner-border" label="Spinning"></div>
 
@@ -46,7 +46,8 @@ export default {
   props: {
     msg: String,
     x: String,
-    y: String
+    y: String,
+    this_tile_tags: Array
   },
   computed: {
     position() {
@@ -54,6 +55,10 @@ export default {
     }
   },
   methods: {
+    new_post: function()
+    {
+      this.$emit('new_post')
+    },
     message_arrived: function(message)
     {
       // Ignore sync notification

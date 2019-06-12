@@ -6,12 +6,12 @@
     <form @submit.prevent="post">
       <textarea class="form-control" placeholder="New message at this location" v-model="message" v-on:click='writing = true'></textarea>
     
-       <vue-tags-input
+      <vue-tags-input
           v-if= 'writing'
           v-model="tag"
           :tags="tags"
           @tags-changed="newTags => tags = newTags"
-        />
+      />
       <button type="submit" v-if= 'writing' class="btn btn-outline-primary">Post</button>
     </form>
 
@@ -22,13 +22,14 @@
 
 import sbotLibs from './../sbot'
 import GIXI from 'gixi'
-import VueTagsInput from '@johmun/vue-tags-input';
+import { VueTagsInput, createTag, createTags } from '@johmun/vue-tags-input';
 
 export default {
   name: 'composer',
   props: {
-    x: String,
-    y: String
+    'x': String,
+    'y': String,
+    'active_tags': Array
   },
   components: {
     VueTagsInput,
@@ -39,7 +40,13 @@ export default {
       message: '',
       writing: false,
       tag: '', 
-      tags: [],
+      tags: []
+    }
+  },
+  watch: {
+    active_tags: function(new_tags, old_tags)
+    {
+      this.$data.tags = createTags( new_tags )
     }
   },
   mounted: function()
@@ -83,6 +90,8 @@ export default {
             content.tags = this.$data.tags.map(x => x.text)
 
           sbotLibs.post_as(ssb, JSON.parse(localStorage.keys), content)
+
+          this.$emit('new_post')
           this.$data.message = ""
         })
       }
