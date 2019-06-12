@@ -180,7 +180,7 @@ export default {
 
   methods: {
     handle_new_post () {
-      console.log("handle_new_post")
+      // console.log("handle_new_post")
       this.$forceUpdate()
       this.getActivity()
     },
@@ -230,8 +230,8 @@ export default {
     // zoomed: function() {
     //   console.log("zoom", d3.event.transform, container_container.attr("transform"))
 
-    //   container_container.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
-    //   // container_container.attr("transform", d3.event.transform);
+    //   // container_container.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+    //   container_container.attr("transform", d3.event.transform);
     // },
 
     dragstarted: function (d) {
@@ -317,20 +317,25 @@ export default {
 
 
 
+    apply_label_attrs: function(labels, topology){
+      return labels
+        .attr("class", "label")
+        .text(function(d) {
+          return d.tags.join(', ');
+        })
+        .attr('transform', function(d) {
+          return 'translate(' + ( d.i * 30 ) + ',' + ( d.j * 30 ) + ')';
+        })
+        .call(draw_label, path, topology)
+    },
+
     update_labels: function(labels, topology) {
       // border = container_container.append("g").append("path")
       //     .attr("class", "border")
       //     .call(draw_border, path, topology);
       // UPDATE
       // Update old elements as needed.
-      labels.attr("class", "label")
-        .text(function(d) {
-          return d.tags.join(', ');
-        })
-        .attr('transform', function(d) {
-          return 'translate(' + d.i * 30 + ',' + d.j * 30 + ')';
-        })
-        .call(draw_label, path, topology);
+      this.apply_label_attrs(labels)
 
       // ENTER
       // Create new elements as needed.
@@ -338,15 +343,8 @@ export default {
       // ENTER + UPDATE
       // After merging the entered elements with the update selection,
       // apply operations to both.
-      labels.enter().append("text")
-        .attr("class", "label")
-        .text(function(d) {
-          return d.tags.join(', ');
-        })
-        .attr('transform', function(d) {
-          return 'translate(' + d.i * 30 + ',' + d.j * 30 + ')';
-        })
-        .call(draw_label, path, topology);
+      this.apply_label_attrs(labels.enter().append("text"))
+        
 
       // EXIT
       // Remove old elements as needed.
@@ -377,9 +375,9 @@ export default {
 
     container_container = svg
 
-    // var zoom = d3.zoom()
-    //   .scaleExtent([0.5, 3])
-    //   .on("zoom", this.zoomed);
+    var zoom = d3.zoom()
+      .scaleExtent([0.5, 3])
+      .on("zoom", this.zoomed);
 
     var drag = d3.drag()
       // .container(svg)
@@ -389,7 +387,7 @@ export default {
 
     svg
       .call(drag)
-      // .call(zoom)
+      .call(zoom)
 
     // Add map visuals
     var imgs = container_container.selectAll("image").data([0]);
