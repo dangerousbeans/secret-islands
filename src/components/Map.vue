@@ -66,17 +66,6 @@ function draw_border(border, path, topology) {
   border.attr("d", path(topojson.mesh(topology, topology.objects.hexagons, function(a, b) { return a.fill ^ b.fill; })));
 }
 
-function draw_label(labels, path, topology) {
-  // console.log("draw_label", labels)
-
-  
-  labels
-    .attr("font-size", 20)
-    .attr("font-family", "monospace")
-   
-  return labels
-}
-
 function hexTopology(radius, width, height) {
   var dx = radius * 2 * Math.sin(Math.PI / 3),
       dy = radius * 1.5,
@@ -110,7 +99,7 @@ function hexTopology(radius, width, height) {
         arcs: [[q, q + 1, q + 2, ~(q + (n + 2 - (j & 1)) * 3), ~(q - 2), ~(q - (n + 2 + (j & 1)) * 3 + 2)]],
         fill: x_pos == i && y_pos == j,
         last_activity: activ ? activ.last_activity : null,
-        tags: (activ && activ.tags) ? activ.tags : [],
+        tags: (activ && activ.tags) ? activ.tags.map((t) => { return typeof t == 'string' ? t : null }) : [],
         j: j,
         i: i,
         id: geom_id
@@ -350,7 +339,6 @@ export default {
         .attr('transform', function(d) {
           return 'translate(' + ( d.i * 30 ) + ',' + ( d.j * 30 ) + ')';
         })
-        .call(draw_label, path, topology)
     },
 
     update_labels: function(labels, topology) {
@@ -438,7 +426,6 @@ export default {
       .datum(topojson.mesh(topology, topology.objects.hexagons))
       // .attr("d", path)
       .attr("class", "label")
-      .call(draw_label, path, topology);
     
     // Hack for if we dont have a position
     // Dump them in aligator city
@@ -496,7 +483,7 @@ text.label {
 
   pointer-events: none; 
 
-  font-size: 10pt;
+  font-size: 11pt;
   opacity: 0.8;
 }
 
