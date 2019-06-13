@@ -105,8 +105,6 @@ function hexTopology(radius, width, height) {
         id: geom_id
       });
 
-      // if(activ && activ.tags.length > 0)
-      //   console.log(activ)
 
       geom_id++;
     }
