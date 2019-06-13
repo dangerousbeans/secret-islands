@@ -85,7 +85,7 @@ export default {
       this.$ssb.then((ssb) => {
         this.$data.ssb = ssb
 
-        sbotLibs.displayName(ssb, localStorage.keys.id, this.name_loaded)
+        sbotLibs.displayName(ssb, JSON.parse(localStorage.keys).id, this.name_loaded)
 
         var x = parseInt(this.$props.x)
         var y = parseInt(this.$props.y)

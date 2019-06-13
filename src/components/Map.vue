@@ -363,6 +363,28 @@ export default {
   },
 
   mounted: function() {
+    // Check we're following the pub
+    this.$ssb.then((ssb) => {
+      var pub_id = "@+COav7rGgSXqV36bsgYJK1EHtUuk9SvojPFGdIzJLlA=.ed25519"
+      var our_id = JSON.parse(localStorage.keys).id
+      
+      ssb.friends.isFollowing({source: our_id, dest: pub_id}, function(err, following)
+      {
+        if(!following)
+        {
+          // console.log("not following, so gunna follow", pub_id, our_id)
+          // follow
+          sbotLibs.post_as(ssb, JSON.parse(localStorage.keys), {
+            type: "contact",
+            contact: pub_id,
+            following: true
+          }, () => {
+            // console.log("followed")
+          })
+        }
+      })    
+    })
+
     // Setup d3 stuff
     var margin = {top: -5, right: -5, bottom: -5, left: -5}
     var svg = d3.select("#map_svg").append("g")
