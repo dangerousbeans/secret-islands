@@ -15,10 +15,11 @@ export default
         queue: []
       } : {id: null, sequence: null, timestamp: null, queue: []}
       ssb.add(
-        create(state, postAs, null, content, Date.now()), function (err, a, b) {
+        create(state, postAs, null, content, Date.now()), function (err, message) {
           if(err)
             throw err
-          console.log("added!", err, a, b)
+          // console.log("added!", message)
+          cb()
         }
       )
     })

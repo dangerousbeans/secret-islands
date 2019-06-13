@@ -163,17 +163,13 @@ export default {
       // console.log("gotdataurl", dataURL)
       var _data = dataurl.parse(dataURL)
 
-      // console.log("got data", _data)
-
       this.$ssb.then((ssb) => {
   
         pull(
           pull.once(_data.data),
-          ssb.blobs.add(function (err, hash) {
+          ssb.blobs.add((err, hash) => {
             if(err) return alert(err.stack)
 
-            // console.log("got blob hash", hash)
-            
             var selected = {
               link: hash,
               size: _data.data.length,
@@ -181,15 +177,14 @@ export default {
               width: 512,
               height: 512
             }
-    
-            // console.log("about to post image", selected)
 
             sbotLibs.post_as(ssb, JSON.parse(localStorage.keys), {
               type: 'about',
               about: JSON.parse(localStorage.keys).id,
               image: selected
-            }, function(err,a ){
+            }, (err,a) => {
               // console.log("finished", err, a)
+              this.$emit('completed')
               this.$emit('uploaded')
             })
           
