@@ -1,24 +1,41 @@
 var Server = require('ssb-server')
 var ssbKeys = require('ssb-keys')
 var Config = require('ssb-config/inject')
-var host = "localhost"
+var host = "ssb.guild.land"
 var config = Config('ssb', {
 	host: host,
 	blobsPort: 8989,
 	connections: { 
 	  "incoming": {
 	    "ws": [{
-	   		"host": host,
+	   		"host": "localhost",
 	   	  "scope": ["public", "local"],
 	      "port": 8989,
 	      "transform": "shs",
 	      "http": true
 	    }],
 	    "net": [
-		{ "port": 8009, "host": "134.209.101.27", "scope": "device", "transform": "noauth" },
-		{ "scope": "public", "transform": "shs", "port": 8008 },
+				{ 
+					"scope": "device", 
+					"port": 8009, 
+					"host": "134.209.101.27", 
+					"transform": "noauth" 
+				},
+				{ 
+					"scope": "public", 
+					"external": [ host ],
+					"host": "0.0.0.0",
+					"transform": "shs", 
+					"port": 8008 
+				},
 	    ],
-            "unix": [{ "scope":"device", "transform":"noauth", "server": true }],
+      "unix": [
+      	{ 
+      		"scope":"device", 
+      		"transform":"noauth", 
+      		"server": true 
+      	}
+      ],
 	  },
 	  "outgoing": {
 	    "net": [{ "transform": "shs" }]
