@@ -11,16 +11,21 @@ module.exports = function (api, opts) {
     {
     	if(following)
     	{
+        console.log("already following:", connecting_id)
     		cb(null, {allow: null, deny: null})
     	}
     	else
     	{
     		// Yay more friendssss
+        console.log("stranger! New friend :3", connecting_id)
+        
     		api.publish({
     			type: "contact",
     			contact: connecting_id,
     			following: true
     		}, function(){
+          console.log("Followed", connecting_id)
+        
     			cb(null, {allow: null, deny: null})
     		})
     	}
