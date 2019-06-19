@@ -20,7 +20,8 @@ export default
           if(err)
             throw err
           // console.log("added!", message)
-          // cb()
+          if(cb)
+            cb()
         }
       )
     })
