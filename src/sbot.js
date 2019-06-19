@@ -2,12 +2,13 @@ import pull from 'pull-stream'
 pull.paraMap = require('pull-paramap')
 const { isBlob } = require('ssb-ref')
 var create = require('ssb-validate').create
+
 export default 
 {
   post_as (ssb, postAs, content, cb) {
     ssb.getLatest(postAs.id, (err, data) => {
-      console.log(err)
-      console.log(data)
+      // console.log(err)
+      // console.log(data)
       var state = data ? {
         id: data.key,
         sequence: data.value.sequence,
@@ -19,7 +20,7 @@ export default
           if(err)
             throw err
           // console.log("added!", message)
-          cb()
+          // cb()
         }
       )
     })
