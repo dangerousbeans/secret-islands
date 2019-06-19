@@ -38,11 +38,11 @@ npm run build
 - [x] render map
 - [x] geo post
 - [x] geo filter posts
-- [ ] public onboarding pub
+- [x] public onboarding pub
 - [ ] warn about using non-local, encourage local sbot or electron version
-- [ ] clingy pub: follow back connection attempts
-- [ ] inital follow (follow the clingy pub to get started)
-- [ ] activity map
+- [x] clingy pub: follow back connection attempts
+- [x] inital follow (follow the clingy pub to get started)
+- [x] activity map
 - [ ] SSB City place to put existing non-geocoded activity
 
 
