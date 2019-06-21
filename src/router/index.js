@@ -3,6 +3,8 @@ import VueRouter from 'vue-router'
 
 import Map from './../components/Map'
 import Profile from './../components/Profile'
+import ViewProfile from './../components/ViewProfile'
+
 
 Vue.use(VueRouter)
 
@@ -14,7 +16,7 @@ export default new VueRouter({
       component: Map
     },
     {
-      path: '/:x/:y',
+      path: '/:x(\\d+)/:y(\\d+)',
       name: 'Map',
       component: Map,
       props: true
@@ -23,6 +25,12 @@ export default new VueRouter({
       path: '/profile',
       name: 'Profile',
       component: Profile
+    },
+    {
+      path: '/profile/:id',
+      name: 'ViewProfile',
+      component: ViewProfile,
+      props: true
     },
   ]
 })

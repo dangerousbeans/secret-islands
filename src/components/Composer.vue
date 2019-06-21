@@ -1,7 +1,9 @@
 
 <template>
   <div class="form-group media mt-2 col-sm-12 message">
-    <img class="pr-3 rounded " style="max-width: 60px;" v-bind:src="avatar">
+    <router-link :to="{ name: 'Profile' }" >
+      <img class="pr-3 rounded " style="max-width: 60px;" v-bind:src="avatar">
+    </router-link>
     
     <form @submit.prevent="post">
       <textarea class="form-control" placeholder="New message at this location" v-model="message" v-on:click='writing = true'></textarea>

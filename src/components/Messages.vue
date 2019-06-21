@@ -146,3 +146,12 @@ export default {
   }
 }
 </script>
+
+
+<style scoped>
+
+.message
+{
+  
+}
+</style>  

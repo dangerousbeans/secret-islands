@@ -1,9 +1,14 @@
 <template><!-- v-bind:class="distant" -->
   <div class="media mt-3 col-sm-12 message" >
-    <img class="pr-3 rounded " style="max-width: 60px;" v-bind:src="avatar">
+    <router-link class="" :to="{ name: 'ViewProfile', params: { id: message.value.author } }" >
+      <img class="pr-3 rounded " style="max-width: 60px;" v-bind:src="avatar">
+    </router-link>
     <div class="media-body">
-      <h5 class="mt-0">
-        {{ author.authorName }}
+      <h5 class="mt-0  text-truncate">
+        <router-link class="text-dark font-weight-bold" :to="{ name: 'ViewProfile', params: { id: message.value.author } }" >
+          {{ author.authorName }}  
+        </router-link>
+    
         <span class="text-muted">
           <span v-for="tag in message.value.content.tags">
             {{ tag }}
