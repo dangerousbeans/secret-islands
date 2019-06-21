@@ -268,10 +268,10 @@ export default {
       var difference = Date.now() - d.last_activity
 
       // max age
-      var max = 86400 * 7 // 1 week
+      var max = 8.64e+6 * 7 // 1 week
       // console.log(max / difference)
 
-      return Math.min( Math.max( max / difference, 0.1 ), 0.4) // so you can still see small things
+      return Math.min( Math.max( max / difference, 0.05 ), 0.35) // so you can still see small things
     },
 
     apply_attributes: function(paths, topology) {
