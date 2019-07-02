@@ -35,10 +35,6 @@ import layout from './circle-layout'
 
 window.map_context = ""
 
-const directives = {
-  // resize
-}
-
 const pull = require('pull-stream')
 const drain = require('pull-stream/sinks/drain')
 
@@ -133,9 +129,13 @@ function hexProjection(radius) {
   };
 }
 
-export default {
+var MIN = {x: -1540, y: -1270},     //top-left corner
+MAX = {x: 0, y: 0};   //bottom-right corner
 
-  directives,
+// var width = 2270
+//       var height = 1300
+
+export default {
 
   components: {
     MapSVG,
@@ -149,7 +149,7 @@ export default {
 
   data () {
     return { 
-      messages: [ ],
+      messages: [],
       activity: {},
       active_tags: [ ]
     }
@@ -221,7 +221,6 @@ export default {
       return layout.updateTransform(g, this.margin, size)
     },
     resize: function() {
-      console.log("resize?")
       const size = this.getSize()
       const {g, svg, tree} = this.internaldata
       
@@ -238,26 +237,31 @@ export default {
       })
     },
 
-    // zoomed: function() {
-    //   console.log("zoom", d3.event.transform, container_container.attr("transform"))
+    zoomed: function() {
+      var transform = d3.event.transform;
 
-    //   // container_container.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
-    //   container_container.attr("transform", d3.event.transform);
+      // limiting tranformation by MIN and MAX bounds
+      transform.x = d3.max([transform.x, MIN.x]);
+      transform.y = d3.max([transform.y, MIN.y]);
+      transform.x = d3.min([transform.x, MAX.x]);
+      transform.y = d3.min([transform.y, MAX.y]);
+
+      container_container.attr("transform", transform);
+    },
+
+    // dragstarted: function (d) {
+    //   d3.event.sourceEvent.stopPropagation();
     // },
 
-    dragstarted: function (d) {
-      d3.event.sourceEvent.stopPropagation();
-    },
+    // dragged: function (d) {
+    //   d.x = d3.event.x;
+    //   d.y = d3.event.y;
 
-    dragged: function (d) {
-      d.x = d3.event.x;
-      d.y = d3.event.y;
+    //   container_container.attr("transform", "translate(" + [d.x, d.y] + ")")
+    // },
 
-      container_container.attr("transform", "translate(" + [d.x, d.y] + ")")
-    },
-
-    dragended: function (d) {
-    },
+    // dragended: function (d) {
+    // },
 
     // For a given activity timestamp, fade it out based on how long ago it was
     activity_to_alpha: function(d) {
@@ -407,19 +411,11 @@ export default {
 
     container_container = svg
 
-    var zoom = d3.zoom()
+    // Zoom / pan behaviour
+    d3.select("#map_svg").call(d3.zoom()
+      // .translateExtent([0, 0], [width, height])
       .scaleExtent([0.5, 3])
-      .on("zoom", this.zoomed);
-
-    var drag = d3.drag()
-      // .container(svg)
-      .on("start", this.dragstarted)
-      .on("drag", this.dragged)
-      .on("end", this.dragended);
-
-    svg
-      .call(drag)
-      .call(zoom)
+      .on("zoom", this.zoomed))
 
     // Add map visuals
     var imgs = container_container.selectAll("image").data([0]);
@@ -430,6 +426,8 @@ export default {
       .attr('width', 2280)
       // .attr('height', 200)
       .attr("xlink:href", require("./../assets/fantasy_map_1554102582670.png"))
+
+
 
     g = container_container.append("g").attr("class", "hexagon");
     

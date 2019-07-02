@@ -22,6 +22,7 @@
     "sass-loader": "^7.1.0",
     "sodium-browserify-tweetnacl": "^0.2.6",
     "ssb-client": "^4.7.2",
+    "ssb-clingy": "^1.0.0",
     "ssb-invite": "^2.0.4",
     "ssb-markdown": "^4.1.1",
     "ssb-validate": "^4.0.4",

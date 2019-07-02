@@ -12,7 +12,7 @@ module.exports = function (api, opts) {
     	if(following)
     	{
         console.log("already following:", connecting_id)
-    		cb(null, {allow: null, deny: null})
+    		cb(null)
     	}
     	else
     	{
@@ -26,7 +26,7 @@ module.exports = function (api, opts) {
     		}, function(){
           console.log("Followed", connecting_id)
         
-    			cb(null, {allow: null, deny: null})
+    			cb(null)
     		})
     	}
     })    
