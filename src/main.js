@@ -7,6 +7,11 @@ Vue.use(VueTimeago, {
     'en': require('date-fns/locale/en'),}
 })
 
+import BootstrapVue from 'bootstrap-vue'
+Vue.use(BootstrapVue)
+import 'bootstrap/dist/css/bootstrap.css'
+import 'bootstrap-vue/dist/bootstrap-vue.css'
+
 import ssbclient from 'vue-ssb'
 
 Vue.use(ssbclient, 

@@ -20,8 +20,10 @@
       <p v-html="textmd"></p>
 
       <div class="float-right text-muted small">
-        <timeago v-if="message.value.timestamp" :datetime="message.value.timestamp" :auto-update="60"></timeago>
-
+        <router-link class="text-dark font-weight-bold" :to="{ name: 'View Post', params: { id: message.value.id } }" >
+          <timeago v-if="message.value.timestamp" :datetime="message.value.timestamp" :auto-update="60"></timeago>
+        </router-link>
+        
         
       </div>
       <!-- {{ relatedMessages }} -->

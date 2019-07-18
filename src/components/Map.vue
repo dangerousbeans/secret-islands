@@ -8,11 +8,8 @@
 
       <div id="" class="col-md-6 scroll">
         <div class="card-body">
-          <h2 class="card-title">⬡ {{x}} / {{y}}</h2>
-
-          <span v-for="tag in active_tags">
-            {{ tag }}
-          </span>
+          <TileInfo :x="x" :y="y" v-bind:active_tags="active_tags"></TileInfo>
+          
           <!-- <h3 class="card-title">{{active_tags}}</h3> -->
           <Messages @new_post="handle_new_post" v-bind:this_tile_tags="active_tags" :x="x" :y="y"></Messages>
         </div>  
@@ -27,7 +24,9 @@
 var d3 = require("d3");
 
 import MapSVG from './map.svg';
+
 import Messages from './../components/Messages'
+import TileInfo from './../components/TileInfo'
 
 import * as topojson from "topojson-client";
 import layout from './circle-layout'
@@ -132,14 +131,12 @@ function hexProjection(radius) {
 var MIN = {x: -1540, y: -1270},     //top-left corner
 MAX = {x: 0, y: 0};   //bottom-right corner
 
-// var width = 2270
-//       var height = 1300
-
 export default {
 
   components: {
     MapSVG,
-    Messages
+    Messages,
+    TileInfo
   },
 
   props: {
@@ -424,7 +421,7 @@ export default {
       .attr('x', 0)
       .attr('y', 0)
       .attr('width', 2280)
-      // .attr('height', 200)
+      .attr('height', 1300)
       .attr("xlink:href", require("./../assets/fantasy_map_1554102582670.png"))
 
 

@@ -61,7 +61,7 @@ config.keys = keys
 Server
   .use(require('./ssb-trusting'))
   .use(require('./ssb-geo-db'))
-  .use(require('./ssb-clingy'))
+  .use(require('ssb-clingy'))
   .use(require('ssb-server/plugins/unix-socket'))
   .use(require('ssb-server/plugins/plugins'))
   .use(require('ssb-gossip'))

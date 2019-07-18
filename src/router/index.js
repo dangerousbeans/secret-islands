@@ -3,7 +3,9 @@ import VueRouter from 'vue-router'
 
 import Map from './../components/Map'
 import Profile from './../components/Profile'
+import Camp from './../components/Camp'
 import ViewProfile from './../components/ViewProfile'
+import Messages from './../components/Messages'
 
 
 Vue.use(VueRouter)
@@ -20,6 +22,16 @@ export default new VueRouter({
       name: 'Map',
       component: Map,
       props: true
+    },
+    {
+      path: '/:x(\\d+)/:y(\\d+)/camp',
+      name: 'New Camp',
+      component: Camp
+    },
+    {
+      path: '/:x(\\d+)/:y(\\d+)/post/:id',
+      name: 'View Post',
+      component: Messages
     },
     {
       path: '/profile',
