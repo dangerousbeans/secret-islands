@@ -70,14 +70,10 @@ export default {
   },
   methods: {
     uploadHandler(uploader){
-      // console.log("uploadHandler", a,b,c)
     },
 
     handleUploading(form, xhr) {
       this.message = "uploading...";
-      console.log("handle_uploading", form, xhr)
-      // xhr.abort()
-
     },
     handleUploaded() {
       // this.user.avatar = response.url;

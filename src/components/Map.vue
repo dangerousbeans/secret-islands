@@ -336,7 +336,7 @@ export default {
           return d.tags.join(', ');
         })
         .attr('transform', function(d) {
-          return 'translate(' + ( d.i * 30 ) + ',' + ( d.j * 30 ) + ')';
+          return 'translate(' + ( d.i * 35 ) + ',' + ( d.j * 30 ) + ')';
         })
     },
 
