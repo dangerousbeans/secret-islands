@@ -6,7 +6,15 @@
     </router-link>
     
     <form @submit.prevent="post">
-      <textarea class="form-control" placeholder="New message at this location" v-model="message" v-on:click='writing = true'></textarea>
+      <textarea 
+        autofocus
+        class="form-control" 
+        placeholder="New message at this location" 
+        v-model="message" 
+        v-on:input='writing = true'
+        v-on:click='writing = true'
+        v-on:blur='message.length == 0 ? writing = false : null'
+      ></textarea>
     
       <vue-tags-input
           v-if= 'writing'
