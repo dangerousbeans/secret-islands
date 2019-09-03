@@ -1,6 +1,6 @@
 <template>
 	<div class="">
-		<h3 class="card-title"><span class="font-weight-bold">⬡</span> {{x}} / {{y}} Unoccupied</h3>
+		<h3 class="card-title"><span class="font-weight-bold">⬡</span> {{x}} / {{y}} {{status}}</h3>
 
     <b-button class="btn-xxs btn-primary" v-b-modal.modal-1>Build a camp 🔥</b-button>
 
@@ -23,6 +23,19 @@ export default {
   props: [ 'x', 'y', 'active_tags' ],
   data() {
     return {      
+    }
+  },
+  computed: {
+    status() {
+      if( this.$route.params.x == 4 && this.$route.params.y == 21)
+      {
+        return "ScuttleCity"
+      }
+      else
+      {
+        return "Unoccupied"  
+      }
+      
     }
   },
   methods: {}

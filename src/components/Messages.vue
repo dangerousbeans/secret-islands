@@ -90,7 +90,32 @@ export default {
         var x = parseInt(this.$props.x)
         var y = parseInt(this.$props.y)
 
-        var q = {
+
+        var scuttlebuttCity = false
+        if(x == 4 && y == 21)
+          scuttlebuttCity = true
+        
+
+        var q
+        if(scuttlebuttCity)
+        {
+          q = {
+          limit: 20,
+          reverse: true,
+          live: true,
+          query: [{
+            $filter: {
+              value: {
+                content: { 
+                  type: 'post'
+                },
+              }
+            }}]
+          }
+        }
+        else
+        {
+          q = {
           limit: 50,
           reverse: true,
           live: true,
@@ -108,16 +133,18 @@ export default {
                 },
               }
             }}]
-        }
+          }
 
-        // filter posts from this area
-        if(!isNaN(x) && !isNaN(y))
-        {
-          var c = q.query[0].$filter.value.content
+          // filter posts from this area
+          if(!isNaN(x) && !isNaN(y))
+          {
+            var c = q.query[0].$filter.value.content
 
-          c.x = { ...c.x, ...{ '$gt': x-distance, '$lt': x+distance } }
-          c.y = { ...c.y, ...{ '$gt': y-distance, '$lt': y+distance } }
+            c.x = { ...c.x, ...{ '$gt': x-distance, '$lt': x+distance } }
+            c.y = { ...c.y, ...{ '$gt': y-distance, '$lt': y+distance } }
+          }
         }
+        
 
         var index = ssb.geospatial.read
         var query = index(q)

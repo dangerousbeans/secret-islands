@@ -265,6 +265,10 @@ export default {
       if(d.last_activity == null)
         return
 
+      // ScuttleCity - no fill
+      if(d.i == 4 && d.j == 21)
+        return 0
+
       // Time difference
       var difference = Date.now() - d.last_activity
 
@@ -280,6 +284,8 @@ export default {
         .attr("d", function(d) { return path(topojson.feature(topology, d)) })
         .attr("fill-opacity", function(d) { return map_context.activity_to_alpha(d) })
         .style("fill", function(d) { return d.last_activity != null ? "Green" : null })
+        //.style("background-image", function(d) { if(true){ return "scuttlebuttCity.png" } })
+      
         .on("click", mousedown)
     },
 
@@ -333,10 +339,17 @@ export default {
       return labels
         .attr("class", "label")
         .text(function(d) {
-          return d.tags.join(', ');
+          if(d.i == 4 && d.j == 21)
+          {
+            return // 'ScuttleCity'
+          }
+          else
+          {
+            return d.tags.join(', ');
+          }
         })
         .attr('transform', function(d) {
-          return 'translate(' + ( d.i * 34.64 ) + ',' + ( d.j * 30 ) + ')';
+          return 'translate(' + ( d.i * 34.64 ) + ',' + ( d.j * 30 - 15) + ')';
         })
     },
 
@@ -515,7 +528,7 @@ text.label {
 .scroll
 {
   overflow-y: scroll;
-  height: 800px;
+  height: 100%;
 }
 
       .reset, html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, b, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, output, ruby, section, summary, time, mark, audio, video {
