@@ -419,7 +419,7 @@ export default {
     imgs.enter()
       .append("svg:image")
       .attr('x', 0)
-      .attr('y', 0)
+      .attr('y', -2)
       .attr('width', 2280)
       .attr('height', 1300)
       .attr("xlink:href", require("./../assets/fantasy_map_1554102582670.png"))
@@ -855,6 +855,8 @@ html, body {
 svg {
   background-color: transparent;
   cursor: default;
+  display: table-cell;
+  height: auto;
 }
 
 #map
