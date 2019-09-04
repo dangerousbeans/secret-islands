@@ -4,7 +4,7 @@
       <img class="pr-3 rounded " style="max-width: 60px;" v-bind:src="avatar">
     </router-link>
     <div class="media-body">
-      <h5 class="mt-0  text-truncate">
+      <h5 class="mt-0 text-truncate">
         <router-link class="text-dark font-weight-bold" :to="{ name: 'ViewProfile', params: { id: message.value.author } }" >
           {{ author.authorName }}  
         </router-link>
@@ -13,14 +13,18 @@
           <span v-for="tag in message.value.content.tags">
             {{ tag }}
           </span>
+          <span>
+            {{ message.value.content.x }}/{{ message.value.content.y }}
+          </span>
+          
           <span class="text-dark" v-if="message.value.content.channel">#{{ message.value.content.channel }}</span>
         </span>
       </h5>
 
-      <p v-html="textmd"></p>
+      <read-more :max-chars="400" :text="textmd"><p ></p></read-more>
 
       <div class="float-right text-muted small">
-        <router-link class="text-dark font-weight-bold" :to="{ name: 'View Post', params: { id: message.value.id } }" >
+        <router-link class="text-muted font-weight-bold" :to="{ name: 'View Post', params: { id: message.value.id } }" >
           <timeago v-if="message.value.timestamp" :datetime="message.value.timestamp" :auto-update="60"></timeago>
         </router-link>
         

@@ -7,6 +7,9 @@ Vue.use(VueTimeago, {
     'en': require('date-fns/locale/en'),}
 })
 
+import ReadMore from 'vue-read-more';
+Vue.use(ReadMore);
+
 import BootstrapVue from 'bootstrap-vue'
 Vue.use(BootstrapVue)
 import 'bootstrap/dist/css/bootstrap.css'
