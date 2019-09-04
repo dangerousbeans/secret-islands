@@ -27,7 +27,7 @@ export default {
   },
   computed: {
     status() {
-      if( this.$route.params.x == 4 && this.$route.params.y == 21)
+      if( (this.$route.params.x == 4 && this.$route.params.y == 21) || !(this.$route.params.x && this.$route.params.y) )
       {
         return "ScuttleCity"
       }
