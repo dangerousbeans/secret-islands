@@ -6,12 +6,12 @@
         <MapSVG id="map_svg"></MapSVG>
       </div>
 
-      <div id="" class="col-md-6 scroll">
-        <div class="card-body">
+      <div id="" class="col-md-6">
+        <div class="card-body scroll" style="max-height: 1500px">
           <TileInfo :x="x" :y="y" v-bind:active_tags="active_tags"></TileInfo>
           
           <!-- <h3 class="card-title">{{active_tags}}</h3> -->
-          <Messages @new_post="handle_new_post" v-bind:this_tile_tags="active_tags" :x="x" :y="y"></Messages>
+          <Messages style="max-height: 100%" @new_post="handle_new_post" v-bind:this_tile_tags="active_tags" :x="x" :y="y"></Messages>
         </div>  
       </div>
 
@@ -173,7 +173,6 @@ export default {
     },
 
     new_activity (err, a) {
-      console.log("new_activity")
       this.$data.activity = a
       
       // Check for active tags where we are

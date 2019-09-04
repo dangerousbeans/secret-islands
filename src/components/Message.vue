@@ -13,7 +13,7 @@
           <span v-for="tag in message.value.content.tags">
             {{ tag }}
           </span>
-          <span>
+          <span v-if="message.value.content.x && message.value.content.y">
             {{ message.value.content.x }}/{{ message.value.content.y }}
           </span>
           

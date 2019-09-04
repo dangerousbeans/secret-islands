@@ -99,6 +99,7 @@ export default {
         var q
         if(scuttlebuttCity)
         {
+          this.$data.loading = false
           q = {
           limit: 20,
           reverse: true,
