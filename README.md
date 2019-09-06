@@ -32,6 +32,11 @@ npm run serve
 npm run build
 ```
 
+### Deploys to ghpages
+```
+npm run ghpages
+```
+
 
 ## TODO
 
