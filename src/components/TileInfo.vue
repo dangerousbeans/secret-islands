@@ -2,7 +2,7 @@
 	<div class="">
 		<h3 class="card-title"><span class="font-weight-bold">⬡</span> {{x}} / {{y}} {{status}}</h3>
 
-    <b-button class="btn-xxs btn-primary" v-b-modal.modal-1>Build a camp 🔥</b-button>
+    <b-button class="btn-xxs btn-primary" v-if="status != 'ScuttleCity'" v-b-modal.modal-1>Build a camp 🔥</b-button>
 
     <b-modal id="modal-1" title="Establish a new Camp">
       <p class="my-4">Build a 🔥</p>
@@ -19,15 +19,10 @@
 <script>
 export default {
   name: 'tile_info',
-  components: {  },
   props: [ 'x', 'y', 'active_tags' ],
-  data() {
-    return {      
-    }
-  },
   computed: {
     status() {
-      if( (this.$route.params.x == 4 && this.$route.params.y == 21) || !(this.$route.params.x && this.$route.params.y) )
+      if(this.scuttlecity())
       {
         return "ScuttleCity"
       }
@@ -38,9 +33,17 @@ export default {
       
     }
   },
-  methods: {}
+  methods: {
+    scuttlecity(){
+      if( (this.$route.params.x == 4 && this.$route.params.y == 21) || !(this.$route.params.x && this.$route.params.y) )
+      {
+        return true
+      }
+      else
+      {
+        return false
+      }
+    }
+  }
 }
 </script>
-
-<style scoped>
-</style>  

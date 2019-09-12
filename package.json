@@ -31,6 +31,7 @@
     "topojson-client": "^3.0.0",
     "vue": "^2.6.10",
     "vue-avatar-cropper": "^1.0.5",
+    "vue-eva-icons": "^1.1.1",
     "vue-read-more": "^1.1.1",
     "vue-router": "^3.0.6",
     "vue-ssb": "^1.0.1",

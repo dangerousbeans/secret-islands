@@ -13,6 +13,7 @@
           <span v-for="tag in message.value.content.tags">
             {{ tag }}
           </span>
+
           <span v-if="message.value.content.x && message.value.content.y">
             {{ message.value.content.x }}/{{ message.value.content.y }}
           </span>
@@ -21,10 +22,20 @@
         </span>
       </h5>
 
-      <read-more :max-chars="400" :text="textmd"><p ></p></read-more>
+      <div class="tweet-text">
+        <read-more :max-chars="400" :text="textmd"></read-more>
+      </div>
+      <div class="tweet-footer">
+        <!-- <a class="tweet-footer-btn">
+          <eva-icon name="message-square-outline"></eva-icon><span>{{replies}}</span>
+        </a> -->
+        <a class="tweet-footer-btn">
+          <eva-icon name="heart-outline"></eva-icon><span>{{likes}}</span>
+        </a>
+      </div>
 
       <div class="float-right text-muted small">
-        <router-link class="text-muted font-weight-bold" :to="{ name: 'View Post', params: { id: message.value.id } }" >
+        <router-link class="text-muted font-weight-bold" :to="{ name: 'View Post', params: { id: message.key, x: message.value.x, y: message.value.y } }" >
           <timeago v-if="message.value.timestamp" :datetime="message.value.timestamp" :auto-update="60"></timeago>
         </router-link>
         
@@ -45,6 +56,7 @@ import GIXI from 'gixi'
 pull.paraMap = require('pull-paramap')
 var md = require('ssb-markdown')
 
+
 export default {
   name: 'message',
   props: ['message'],
@@ -53,7 +65,9 @@ export default {
     return {
       avatar: "https://via.placeholder.com/90x90",
       author: "...",
-      textmd: "..."
+      textmd: "...",
+      likes: 0,
+      replies: 0
     }
   },
   // computed: {
@@ -80,6 +94,10 @@ export default {
     {
       if(avatar)
         this.$data.avatar = "http://ssb.guild.land/blobs/get/" + avatar
+    },
+    likes_loaded: function(err, likes)
+    {
+      
     }
   },
 
@@ -98,6 +116,17 @@ export default {
 </script>
 
 <style scoped>
+
+.tweet-footer-btn {
+  margin-right: 30px;
+}
+.tweet-footer-btn i, .tweet-footer-btn span {
+  color: #657786;
+  font-size: 16px;
+}
+.tweet-footer-btn span {
+  margin-left: 8px;
+}
 
 .distant
 {

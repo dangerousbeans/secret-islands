@@ -15,6 +15,9 @@ Vue.use(BootstrapVue)
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
 
+import EvaIcons from 'vue-eva-icons'
+Vue.use(EvaIcons)
+
 import ssbclient from 'vue-ssb'
 
 Vue.use(ssbclient, 
