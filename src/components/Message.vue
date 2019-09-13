@@ -29,8 +29,8 @@
         <!-- <a class="tweet-footer-btn">
           <eva-icon name="message-square-outline"></eva-icon><span>{{replies}}</span>
         </a> -->
-        <a class="tweet-footer-btn">
-          <eva-icon name="heart-outline"></eva-icon><span>{{likes}}</span>
+        <a class="tweet-footer-btn" v-on:click="likeClick">
+          <eva-icon name="heart-outline" animation="pulse"></eva-icon><span>{{likes}}</span>
         </a>
       </div>
 
@@ -38,8 +38,6 @@
         <router-link class="text-muted font-weight-bold" :to="{ name: 'View Post', params: { id: message.key, x: message.value.x, y: message.value.y } }" >
           <timeago v-if="message.value.timestamp" :datetime="message.value.timestamp" :auto-update="60"></timeago>
         </router-link>
-        
-        
       </div>
       <!-- {{ relatedMessages }} -->
       <!-- <message v-for="mess in relatedMessages" :message="mess">
@@ -59,7 +57,12 @@ var md = require('ssb-markdown')
 
 export default {
   name: 'message',
-  props: ['message'],
+  props: { 
+    'message': {},
+    'x': String,
+    'y': String,
+    'active_tags': Array
+   },
 
   data() {
     return {
@@ -70,14 +73,7 @@ export default {
       replies: 0
     }
   },
-  // computed: {
-  //   distant: function () {
-  //     return {
-  //       distant: (parseInt(this.$props.message.x) != parseInt(this.$route.params.x)) && 
-  //       (parseInt(this.$props.message.y) != parseInt(this.$route.params.y)),
-  //     }
-  //   }
-  // },
+  
   methods: {
     name_loaded: function(err, name)
     {
@@ -97,7 +93,34 @@ export default {
     },
     likes_loaded: function(err, likes)
     {
-      
+      console.log("likes_loaded", likes)
+      this.$data.likes = likes
+    },
+    likeClick: function()
+    {
+      console.log("like click")
+
+      this.$ssb.then((ssb) => {
+        var x = parseInt(this.$props.x)
+        var y = parseInt(this.$props.y)
+
+        var content = {
+            type: 'vote',
+            x: x,
+            y: y,
+            channel: this.message.value.content.channel,
+            tags: this.message.value.content.tags,
+            vote: { 
+              value: 1, 
+              link: this.message.key
+            }
+          }
+
+          console.log("posting:", content)
+
+          sbotLibs.post_as(ssb, JSON.parse(localStorage.keys), content)
+          console.log("posted?")
+        })
     }
   },
 
@@ -108,7 +131,8 @@ export default {
     // Async fetch and connect ssb
     this.$ssb.then((ssb) => {
       sbotLibs.displayName(ssb, this.message.value.author, this.name_loaded)
-      sbotLibs.avatar(ssb, this.message.value.author, this.avatar_loaded)      
+      sbotLibs.avatar(ssb, this.message.value.author, this.avatar_loaded)    
+      sbotLibs.countStream(ssb, this.message.key, this.likes_loaded)  
     })
   },
   
@@ -127,12 +151,13 @@ export default {
 .tweet-footer-btn span {
   margin-left: 8px;
 }
-
+.tweet-footer-btn svg
+{
+  cursor: pointer !important; 
+}
 .distant
 {
   color: grey;
 }
 
-img {
-}
 </style>  

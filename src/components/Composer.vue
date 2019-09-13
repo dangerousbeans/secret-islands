@@ -85,7 +85,7 @@ export default {
         var x = parseInt(this.$props.x)
         var y = parseInt(this.$props.y)
 
-        console.log(this.$data.tags)
+        // console.log(this.$data.tags)
 
         this.$ssb.then((ssb) => {
           var content = {

@@ -27,6 +27,56 @@ export default
     })
   },
 
+  countStream: function (sbot, dest, cb) {
+    function present (value) {
+      return value != null
+    }
+    const ids = new Set()
+    let sync = false
+    
+    var reverse = true
+    var live = true
+    var limit = 500
+
+    pull(
+      sbot.backlinks.read({
+        reverse,
+        live,
+        limit,
+        query: [{
+          $filter: {
+            dest,
+            value: { content: { type: 'vote', vote: { link: dest } } }
+          }
+        }]
+      }),
+      pull.map(msg => {
+        if (msg.sync) {
+          sync = true
+          cb(null, ids.size)
+        }
+
+        const author = msg.value.author
+        const vote = msg.value.content.vote
+        if (vote) {
+          if (vote.value > 0) {
+            ids.add(author)
+          } else {
+            ids.delete(author)
+          }
+        }
+
+        if (sync) {
+          return ids.size
+        }
+      }),
+      pull.filter(present),
+      cb(null, ids.size)
+    )
+  },
+
+
+
   displayName (sbot, feedId, cb) {
     var data = {}
 
@@ -59,7 +109,7 @@ export default
         sbot.query.read(opts),
         pull.collect((err, results) => {
         if (err) {
-          this.cb(err)
+          cb(err)
           return
         }
 
@@ -74,8 +124,8 @@ export default
       })
     )
   },
-  avatar (sbot, feedId, cb) {
 
+  avatar (sbot, feedId, cb) {
     const opts = {
       reverse: true,
       query: [

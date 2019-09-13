@@ -4,7 +4,7 @@
 
     <div v-if="loading" class="spinner-border" label="Spinning"></div>
 
-    <Message v-for="message in messages" :message="message" v-bind:key="message.key"></Message>
+    <Message v-for="message in messages" :message="message" v-bind:key="message.key" :x="$props.x" :y="$props.y"></Message>
   </div>
 </template>
 
