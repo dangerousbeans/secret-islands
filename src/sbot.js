@@ -9,21 +9,24 @@ function present (value) {
 
 export default 
 {
+  loadMessage: function(sbot, dest, cb) {
+    
+  },
+
+  // Add a new message to the log, signed with the postAs key
   post_as (ssb, postAs, content, cb) {
     ssb.getLatest(postAs.id, (err, data) => {
-      // console.log(err)
-      // console.log(data)
       var state = data ? {
         id: data.key,
         sequence: data.value.sequence,
         timestamp: data.value.timestamp,
         queue: []
       } : {id: null, sequence: null, timestamp: null, queue: []}
+      
       ssb.add(
         create(state, postAs, null, content, Date.now()), function (err, message) {
           if(err)
             throw err
-          // console.log("added!", message)
           if(cb)
             cb()
         }
@@ -31,6 +34,27 @@ export default
     })
   },
 
+  // Get a live stream of all posts related to @dest
+  related: function(sbot, dest, cb) {
+    pull(
+      sbot.backlinks.read({ 
+        live: true,
+        query: [{
+          $filter: {
+            dest,
+            value: { content: { type: 'post' } }
+            }
+          }],
+        }
+      ),
+      pull.filter(msg => !msg.sync),
+      pull.drain(msg => {
+        cb(null, msg)
+      })
+    )
+  },
+
+  // Get a live stream of all the votes related to @dest
   countStream: function (sbot, dest, cb) {
     pull(
       sbot.backlinks.read({ 
@@ -89,7 +113,6 @@ export default
         var name
         if (!results || !results.length) name = feedId
         else name = results[0].name
-        // console.log(name) // debug / see the names fly by as we get them!
 
         data.authorName = name
         

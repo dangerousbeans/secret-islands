@@ -23,7 +23,7 @@
       </h5>
 
       <div class="tweet-text">
-        <read-more :max-chars="400" :text="textmd"></read-more>
+        <read-more more-str="[more]" less-str="[less]" :max-chars="400" :text="textmd"></read-more>
       </div>
       <div class="tweet-footer">
         <!-- <a class="tweet-footer-btn">
@@ -35,14 +35,18 @@
       </div>
 
       <div class="float-right text-muted small">
-        <router-link class="text-muted font-weight-bold" :to="{ name: 'View Post', params: { id: message.key, x: message.value.x, y: message.value.y } }" >
+        <!-- <router-link class="text-muted font-weight-bold" :to="{ name: 'View Post', params: { id: message.key, x: message.value.x, y: message.value.y } }" > -->
           <timeago v-if="message.value.timestamp" :datetime="message.value.timestamp" :auto-update="60"></timeago>
-        </router-link>
+        <!-- </router-link> -->
       </div>
-      <!-- {{ relatedMessages }} -->
-      <!-- <message v-for="mess in relatedMessages" :message="mess">
-      </message> -->
+<!-- 
+      <pre>
+        {{ message }}
+      </pre>
 
+      <message v-for="r in related" :message="r">
+      </message>
+ -->
     </div>
   </div>
 </template>
@@ -70,6 +74,7 @@ export default {
       author: "...",
       textmd: "...",
       likes: [],
+      related: [],
       replies: 0
     }
   },
@@ -86,6 +91,10 @@ export default {
         this.$data.avatar = imageData
       }
     },
+    related_loaded: function(err, related)
+    {
+      this.$data.related.push(related)
+    },
     avatar_loaded: function(err, avatar)
     {
       if(avatar)
@@ -94,6 +103,10 @@ export default {
     like_loaded: function(err, like)
     {
       this.$data.likes.push(like)
+    },
+    previous_loaded: function(err, prev)
+    {
+      this.$data.previous = prev
     },
     likeClick: function()
     {
@@ -127,6 +140,9 @@ export default {
       sbotLibs.displayName(ssb, this.message.value.author, this.name_loaded)
       sbotLibs.avatar(ssb, this.message.value.author, this.avatar_loaded)    
       sbotLibs.countStream(ssb, this.message.key, this.like_loaded)  
+      // sbotLibs.related(ssb, this.message.key, this.related_loaded)  
+      // if(this.message.value.previous)
+        // sbotLibs.loadMessage(ssb, this.message.value.previous, this.previous_loaded)
     })
   },
   
