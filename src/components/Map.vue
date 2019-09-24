@@ -917,7 +917,7 @@ svg {
 .mesh {
   fill: none;
   stroke: #000;
-  stroke-opacity: .2;
+  stroke-opacity: .1;
   pointer-events: none;
 }
 
