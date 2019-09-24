@@ -3,6 +3,10 @@ pull.paraMap = require('pull-paramap')
 const { isBlob } = require('ssb-ref')
 var create = require('ssb-validate').create
 
+function present (value) {
+  return value != null
+}
+
 export default 
 {
   post_as (ssb, postAs, content, cb) {
@@ -28,54 +32,23 @@ export default
   },
 
   countStream: function (sbot, dest, cb) {
-    function present (value) {
-      return value != null
-    }
-    const ids = new Set()
-    let sync = false
-    
-    var reverse = true
-    var live = true
-    var limit = 500
-
     pull(
-      sbot.backlinks.read({
-        reverse,
-        live,
-        limit,
+      sbot.backlinks.read({ 
+        live: true,
         query: [{
           $filter: {
             dest,
             value: { content: { type: 'vote', vote: { link: dest } } }
-          }
-        }]
-      }),
-      pull.map(msg => {
-        if (msg.sync) {
-          sync = true
-          cb(null, ids.size)
+            }
+          }],
         }
-
-        const author = msg.value.author
-        const vote = msg.value.content.vote
-        if (vote) {
-          if (vote.value > 0) {
-            ids.add(author)
-          } else {
-            ids.delete(author)
-          }
-        }
-
-        if (sync) {
-          return ids.size
-        }
-      }),
-      pull.filter(present),
-      cb(null, ids.size)
+      ),
+      pull.filter(msg => !msg.sync),
+      pull.drain(msg => {
+        cb(null, msg)
+      })
     )
   },
-
-
 
   displayName (sbot, feedId, cb) {
     var data = {}

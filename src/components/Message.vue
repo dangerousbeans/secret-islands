@@ -30,7 +30,7 @@
           <eva-icon name="message-square-outline"></eva-icon><span>{{replies}}</span>
         </a> -->
         <a class="tweet-footer-btn" v-on:click="likeClick">
-          <eva-icon name="heart-outline" animation="pulse"></eva-icon><span>{{likes}}</span>
+          <eva-icon name="heart-outline" animation="pulse"></eva-icon><span>{{ likes.length }}</span>
         </a>
       </div>
 
@@ -69,7 +69,7 @@ export default {
       avatar: "https://via.placeholder.com/90x90",
       author: "...",
       textmd: "...",
-      likes: 0,
+      likes: [],
       replies: 0
     }
   },
@@ -91,15 +91,12 @@ export default {
       if(avatar)
         this.$data.avatar = "http://ssb.guild.land/blobs/get/" + avatar
     },
-    likes_loaded: function(err, likes)
+    like_loaded: function(err, like)
     {
-      console.log("likes_loaded", likes)
-      this.$data.likes = likes
+      this.$data.likes.push(like)
     },
     likeClick: function()
     {
-      console.log("like click")
-
       this.$ssb.then((ssb) => {
         var x = parseInt(this.$props.x)
         var y = parseInt(this.$props.y)
@@ -116,10 +113,7 @@ export default {
             }
           }
 
-          console.log("posting:", content)
-
           sbotLibs.post_as(ssb, JSON.parse(localStorage.keys), content)
-          console.log("posted?")
         })
     }
   },
@@ -132,7 +126,7 @@ export default {
     this.$ssb.then((ssb) => {
       sbotLibs.displayName(ssb, this.message.value.author, this.name_loaded)
       sbotLibs.avatar(ssb, this.message.value.author, this.avatar_loaded)    
-      sbotLibs.countStream(ssb, this.message.key, this.likes_loaded)  
+      sbotLibs.countStream(ssb, this.message.key, this.like_loaded)  
     })
   },
   
